@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Maker</title>
+
+    <!-- Google Fonts: Press Start 2P for a retro Nintendo-like look -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        :root {
+            --background-color: #87cefa;
+            --text-color: #333;
+            --button-color: #ffcc00;
+            --button-text-color: white;
+            --button-border-color: #ff3333;
+            --button-shadow-color: #cc0000;
+            --field-background-color: #f0f0f0;
+            --field-text-color: #333;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --button-color: #ff3333;
+            --button-text-color: #fff;
+            --button-border-color: #ffcc00;
+            --button-shadow-color: #ffae00;
+            --field-background-color: #333333;
+            --field-text-color: #f0f0f0;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            text-shadow: 2px 2px #fff, 4px 4px var(--text-color);
+        }
+
+        h1 span {
+            display: block;
+        }
+
+        h1 span:first-child {
+            font-size: 48px;
+            line-height: 1;
+        }
+
+        h1 span:last-child {
+            font-size: 64px;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .container {
+            background-color: var(--background-color);
+            border: 5px solid var(--button-border-color);
+            border-radius: 20px;
+            padding: 30px;
+            width: 600px;
+            max-width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .field {
+            margin: 10px 0;
+            padding: 15px;
+            border: 3px solid var(--button-border-color);
+            background-color: var(--field-background-color);
+            color: var(--field-text-color);
+            font-size: 18px;
+            width: 90%;
+            text-align: left;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .field.spin {
+            animation: spinText 0.5s ease-in-out 3;
+        }
+
+        @keyframes spinText {
+            0% {
+                transform: rotateX(0deg);
+            }
+            50% {
+                transform: rotateX(180deg);
+            }
+            100% {
+                transform: rotateX(360deg);
+            }
+        }
+
+        .nintendo-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: 5px solid var(--button-border-color);
+            border-radius: 50px;
+            box-shadow: 0 8px var(--button-shadow-color), 0 16px rgba(0, 0, 0, 0.3);
+            margin: 10px 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 1px #333;
+        }
+
+        .nintendo-button.prominent {
+            padding: 15px 30px;
+            font-size: 18px;
+        }
+
+        .nintendo-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px var(--button-shadow-color), 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nintendo-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px var(--button-shadow-color), 0 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: auto;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+
+        .language-button {
+            padding: 8px 15px;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: 3px solid var(--button-border-color);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 1px #333;
+            text-align: center;
+        }
+
+        .language-button.active {
+            background-color: var(--button-border-color);
+            color: white;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-top: 10px;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--button-border-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .mode-label {
+            font-size: 12px;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .resources-btn {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .resources-btn a .nintendo-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            h1 span:first-child {
+                font-size: 36px;
+            }
+
+            h1 span:last-child {
+                font-size: 48px;
+            }
+
+            .field {
+                font-size: 16px;
+            }
+
+            .nintendo-button.prominent {
+                font-size: 16px;
+                padding: 12px 24px;
+            }
+
+            .resources-btn a .nintendo-button {
+                padding: 8px 15px;
+                font-size: 10px;
+            }
+
+            .language-button {
+                font-size: 10px;
+                padding: 6px 12px;
+                margin-bottom: 6px;
+            }
+
+            .switch {
+                width: 50px;
+                height: 28px;
+            }
+
+            .slider:before {
+                width: 22px;
+                height: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="title">
+        <span>Monster</span>
+        <span>MAKER</span>
+    </h1>
+
+    <div class="container">
+        <div class="field" id="field1">Body: </div>
+        <div class="field" id="field2">Head: </div>
+        <div class="field" id="field3">Limbs: </div>
+        <div class="field" id="field4">Special Feature: </div>
+        <div class="field" id="field5">Size: </div>
+
+        <button class="nintendo-button prominent" id="createMonsterBtn" onclick="populateFields()">Create Monster</button>
+    </div>
+
+    <div class="bottom-section">
+        <div class="resources-btn">
+            <a id="resourcesLink" target="_blank">
+                <button class="nintendo-button">Classroom Resources</button>
+            </a>
+            <a id="buyLink" target="_blank">
+                <button class="nintendo-button">Buy the Board Game</button>
+            </a>
+        </div>
+
+        <div class="language-buttons">
+            <button class="language-button" id="btn-en" onclick="setLanguage('en')">English</button>
+            <button class="language-button" id="btn-es" onclick="setLanguage('es')">Español</button>
+            <button class="language-button" id="btn-no" onclick="setLanguage('no')">Norsk</button>
+        </div>
+
+        <div class="dark-mode-toggle">
+            <label class="mode-label" for="darkModeSwitch">Dark Mode</label>
+            <label class="switch">
+                <input type="checkbox" id="darkModeSwitch" onclick="toggleDarkMode()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Advanced Mode Toggle -->
+        <div class="advanced-mode-toggle">
+            <label class="mode-label" for="modeToggleSwitch">Advanced Mode</label>
+            <label class="switch">
+                <input type="checkbox" id="modeToggleSwitch" onclick="toggleMode()">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let isAdvancedMode = false;
+
+        const monsterData = {
+            en: {
+                bodyOptions: {
+                    basic: ['scaly', 'furry', 'slimy'],
+                    advanced: ['rocky', 'metallic', 'crystalline']
+                },
+                headOptions: {
+                    basic: ['dragon-like', 'humanoid', 'skull'],
+                    advanced: ['multiple-eyed', 'horned', 'tentacled']
+                },
+                limbsOptions: {
+                    basic: ['tentacles', 'clawed arms', 'wings'],
+                    advanced: ['hooves', 'multiple legs', 'robotic limbs']
+                },
+                specialFeatureOptions: {
+                    basic: ['breathes fire', 'glows in the dark', 'invisible'],
+                    advanced: ['regenerates', 'teleports', 'mind control']
+                },
+                sizeOptions: {
+                    basic: ['gigantic', 'tiny', 'average-sized'],
+                    advanced: ['colossal', 'miniature', 'enormous']
+                },
+                labels: {
+                    title: 'Monster Maker',
+                    createButton: 'Create Monster',
+                    classroomResources: 'Classroom Resources',
+                    buyGame: 'Buy the Board Game',
+                    resourcesLink: 'https://www.google.com',
+                    buyLink: 'https://www.amazon.com'
+                }
+            },
+            es: {
+                bodyOptions: {
+                    basic: ['escamoso', 'peludo', 'viscoso'],
+                    advanced: ['rocoso', 'metálico', 'cristalino']
+                },
+                headOptions: {
+                    basic: ['parecido a un dragón', 'humanoide', 'calavera'],
+                    advanced: ['con múltiples ojos', 'cornudo', 'tentáculos']
+                },
+                limbsOptions: {
+                    basic: ['tentáculos', 'brazos con garras', 'alas'],
+                    advanced: ['pezuñas', 'múltiples patas', 'extremidades robóticas']
+                },
+                specialFeatureOptions: {
+                    basic: ['lanza fuego', 'brilla en la oscuridad', 'invisible'],
+                    advanced: ['regenera', 'teletransporta', 'control mental']
+                },
+                sizeOptions: {
+                    basic: ['gigante', 'diminuto', 'tamaño promedio'],
+                    advanced: ['colosal', 'miniatura', 'enorme']
+                },
+                labels: {
+                    title: 'Creador de Monstruos',
+                    createButton: 'Crear Monstruo',
+                    classroomResources: 'Recursos para Maestros',
+                    buyGame: 'Compra el Juego de Cartas',
+                    resourcesLink: 'https://www.google.es',
+                    buyLink: 'https://www.mercadolibre.com.uy'
+                }
+            },
+            no: {
+                bodyOptions: {
+                    basic: ['skjellete', 'lodden', 'slimete'],
+                    advanced: ['steinete', 'metallisk', 'krystallinsk']
+                },
+                headOptions: {
+                    basic: ['drage-lignende', 'menneskelig', 'hodeskalle'],
+                    advanced: ['flereøyet', 'hornet', 'tentakler']
+                },
+                limbsOptions: {
+                    basic: ['tentakler', 'klør', 'vinger'],
+                    advanced: ['hover', 'flere ben', 'robotlemmer']
+                },
+                specialFeatureOptions: {
+                    basic: ['puster ild', 'lyser i mørket', 'usynlig'],
+                    advanced: ['regenererer', 'teleporterer', 'tankekontroll']
+                },
+                sizeOptions: {
+                    basic: ['gigantisk', 'liten', 'gjennomsnittlig'],
+                    advanced: ['kolossal', 'miniature', 'enorm']
+                },
+                labels: {
+                    title: 'Monster Skaper',
+                    createButton: 'Lag Monster',
+                    classroomResources: 'Bruk meg i Klasserommet',
+                    buyGame: 'Kjøp Kortspillet',
+                    resourcesLink: 'https://www.google.no',
+                    buyLink: 'https://www.finn.no'
+                }
+            }
+        };
+
+        function getRandomItem(list) {
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        function populateFields() {
+            const languageData = monsterData[currentLanguage];
+            const mode = isAdvancedMode ? 'advanced' : 'basic';
+            
+            const fields = [
+                { id: "field1", option: getRandomItem(languageData.bodyOptions[mode]) },
+                { id: "field2", option: getRandomItem(languageData.headOptions[mode]) },
+                { id: "field3", option: getRandomItem(languageData.limbsOptions[mode]) },
+                { id: "field4", option: getRandomItem(languageData.specialFeatureOptions[mode]) },
+                { id: "field5", option: getRandomItem(languageData.sizeOptions[mode]) },
+            ];
+
+            fields.forEach(field => {
+                const element = document.getElementById(field.id);
+                element.classList.add('spin');
+                setTimeout(() => {
+                    element.textContent = `${field.option}`;
+                    element.classList.remove('spin');
+                }, 1500);
+            });
+        }
+
+        function toggleMode() {
+            isAdvancedMode = document.getElementById("modeToggleSwitch").checked;
+            populateFields();
+        }
+
+        function setLanguage(language) {
+            currentLanguage = language;
+            const languageData = monsterData[currentLanguage];
+
+            document.getElementById("title").innerHTML = `
+                <span>${languageData.labels.title.split(' ')[0]}</span>
+                <span>${languageData.labels.title.split(' ')[1]}</span>
+            `;
+
+            document.getElementById("createMonsterBtn").textContent = languageData.labels.createButton;
+            document.getElementById("resourcesLink").href = languageData.labels.resourcesLink;
+            document.getElementById("resourcesLink").querySelector('button').textContent = languageData.labels.classroomResources;
+            document.getElementById("buyLink").href = languageData.labels.buyLink;
+            document.getElementById("buyLink").querySelector('button').textContent = languageData.labels.buyGame;
+
+            document.querySelectorAll('.language-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`btn-${language}`).classList.add('active');
+
+            populateFields();
+        }
+
+        function toggleDarkMode() {
+            const body = document.body;
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+            }
+        }
+
+        // Initialize with English as the default language and basic mode
+        setLanguage('en');
+    </script>
+</body>
+</html>
