@@ -18,26 +18,50 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      flex-direction: column;
     }
 
     .container {
       text-align: center;
     }
 
-    /* Title Box */
+    /* NES-style Title Box */
     .title-box {
-      background-color: #fff;
-      color: #000;
-      border: 4px solid #fff;
-      padding: 20px;
+      background-color: #000;
+      color: #fff;
+      border: 8px solid #fff;
+      padding: 20px 40px;
       margin-bottom: 40px;
       display: inline-block;
+      position: relative;
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    /* Adding pixelated border inside the header for NES effect */
+    .title-box::before,
+    .title-box::after {
+      content: '';
+      position: absolute;
+      border: 4px solid #ff0000; /* Bright NES red */
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+    }
+
+    .title-box::after {
+      border-color: #00ff00; /* NES green */
+      top: -20px;
+      left: -20px;
+      right: -20px;
+      bottom: -20px;
     }
 
     .title-box h1 {
       font-size: 48px;
       margin: 0;
+      color: #fff;
+      text-shadow: 2px 2px 0 #ff0000, 4px 4px 0 #00ff00; /* NES shadow effect */
     }
 
     /* Glitch Effect for Buttons */
