@@ -7,6 +7,26 @@
   <!-- Retro 16-bit font -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Inline additional styles for the app list */
+    .app-list {
+      display: none;
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+    .app-list li {
+      margin: 10px 0;
+    }
+    .app-list a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+    }
+    .app-list a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -17,11 +37,30 @@
     
     <!-- Menu Box -->
     <main class="menu-box">
-      <a href="apps.html" class="menu-item">APPS</a>
+      <button class="menu-item" onclick="toggleApps()">APPS</button>
       <a href="art.html" class="menu-item">ART</a>
       <a href="texts.html" class="menu-item">TEXTS</a>
       <a href="shop.html" class="menu-item">SHOP</a>
+      
+      <!-- App List (Initially Hidden) -->
+      <ul id="appList" class="app-list">
+        <li><a href="BUGAMATICO.html">BUGAMATICO</a></li>
+        <li><a href="Monster_Maker.html">Monster Maker</a></li>
+        <li><a href="https://dhis2.org" target="_blank">DHIS2</a></li>
+      </ul>
     </main>
   </div>
+
+  <!-- JavaScript to Toggle App List -->
+  <script>
+    function toggleApps() {
+      const appList = document.getElementById('appList');
+      if (appList.style.display === 'none' || appList.style.display === '') {
+        appList.style.display = 'block';
+      } else {
+        appList.style.display = 'none';
+      }
+    }
+  </script>
 </body>
 </html>
