@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monster Maker</title>
 
-    <!-- Google Fonts: Press Start 2P -->
+    <!-- Google Fonts: Press Start 2P for a retro Nintendo-like look -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
@@ -50,21 +50,38 @@
         h1 {
             margin-bottom: 30px;
             text-shadow: 2px 2px #fff, 4px 4px var(--text-color);
+            padding: 0 20px;
+            box-sizing: border-box;
         }
 
         h1 span {
             display: block;
+            line-height: 1;
         }
 
         h1 span:first-child {
             font-size: 48px;
-            line-height: 1;
         }
 
         h1 span:last-child {
             font-size: 64px;
-            line-height: 1;
             text-transform: uppercase;
+        }
+
+        /* Responsive title for mobile */
+        @media (max-width: 600px) {
+            h1 {
+                margin-bottom: 20px;
+                padding: 0 10px;
+            }
+
+            h1 span:first-child {
+                font-size: 36px;
+            }
+
+            h1 span:last-child {
+                font-size: 48px;
+            }
         }
 
         .container {
@@ -204,11 +221,7 @@
             border-radius: 50%;
         }
 
-        input:checked + .slider {
-            background-color: var(--button-border-color);
-        }
-
-        input:checked + .slider:before {
+                input:checked + .slider:before {
             transform: translateX(26px);
         }
 
@@ -230,6 +243,11 @@
         }
 
         @media (max-width: 600px) {
+            h1 {
+                margin-bottom: 20px;
+                padding: 0 10px;
+            }
+
             h1 span:first-child {
                 font-size: 36px;
             }
@@ -311,7 +329,7 @@
             </label>
         </div>
 
-        <!-- Advanced Mode Toggle esto nos da los elementos avanzados o no -->
+        <!-- Advanced Mode Toggle -->
         <div class="advanced-mode-toggle">
             <label class="mode-label" for="modeToggleSwitch">Advanced Mode</label>
             <label class="switch">
@@ -320,7 +338,7 @@
             </label>
         </div>
     </div>
-  <!-- esta es la lista de terminos en los distintos idiomas y en modo basico y avanzado, estan divididos en cabeza, cuerpo, extremidades, etc -->
+
     <script>
         let currentLanguage = 'en';
         let isAdvancedMode = false;
@@ -378,7 +396,7 @@
                     advanced: ['colosal', 'miniatura', 'enorme']
                 },
                 labels: {
-                    title: 'Fabricando Monstruos',
+                    title: 'Monster Maker',
                     createButton: 'Crear Monstruo',
                     classroomResources: 'Recursos para Maestros',
                     buyGame: 'Compra el Juego de Cartas',
@@ -486,3 +504,6 @@
     </script>
 </body>
 </html>
+
+
+       
