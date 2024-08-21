@@ -40,7 +40,7 @@
       margin: 0;
     }
 
-    /* App List and Social Links */
+    /* Glitch Effect for Buttons */
     .app-list {
       margin-top: 30px;
       display: flex;
@@ -48,7 +48,6 @@
       gap: 20px;
     }
 
-    /* Button Styling */
     .app-list-item {
       background-color: #fff;
       color: #000;
@@ -61,95 +60,46 @@
       position: relative;
       overflow: hidden;
       transition: transform 0.3s ease;
-      cursor: pointer;
     }
 
+    .app-list-item::before,
+    .app-list-item::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -5px;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 255, 255, 0.1); /* Cyan */
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .app-list-item::after {
+      background: rgba(0, 0, 255, 0.1); /* Blue */
+      left: 5px;
+    }
+
+    /* Glitch animation on hover */
     .app-list-item:hover {
-      animation: glitch 0.5s infinite;
       transform: scale(1.05);
     }
 
-    .app-list-item:active {
-      animation: glitch-intense 0.2s infinite;
-    }
-
-    /* Glitch Effect */
-    @keyframes glitch {
-      0% {
-        transform: translate(0);
-      }
-      20% {
-        transform: translate(-2px, 2px);
-      }
-      40% {
-        transform: translate(2px, -2px);
-      }
-      60% {
-        transform: translate(-2px, -2px);
-      }
-      80% {
-        transform: translate(2px, 2px);
-      }
-      100% {
-        transform: translate(0);
-      }
-    }
-
-    @keyframes glitch-intense {
-      0% {
-        transform: translate(0);
-      }
-      10% {
-        transform: translate(-4px, 4px);
-      }
-      20% {
-        transform: translate(4px, -4px);
-      }
-      30% {
-        transform: translate(-4px, -4px);
-      }
-      40% {
-        transform: translate(4px, 4px);
-      }
-      50% {
-        transform: translate(-4px, 4px);
-      }
-      60% {
-        transform: translate(4px, -4px);
-      }
-      70% {
-        transform: translate(-4px, -4px);
-      }
-      80% {
-        transform: translate(4px, 4px);
-      }
-      90% {
-        transform: translate(-4px, 4px);
-      }
-      100% {
-        transform: translate(0);
-      }
-    }
-
-    /* Hover Glitch Variations */
     .app-list-item:hover::before,
     .app-list-item:hover::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.2);
-      z-index: 1;
-      pointer-events: none;
+      opacity: 1;
+      transform: translate(3px, -3px);
     }
 
-    .app-list-item:hover::after {
-      top: -2px;
-      left: 2px;
-      background: rgba(0, 0, 0, 0.1);
-      z-index: 2;
+    /* Intense glitch effect on click */
+    .app-list-item:active::before,
+    .app-list-item:active::after {
+      transform: translate(-5px, 5px);
+      opacity: 1;
+      transition: transform 0.1s ease;
     }
   </style>
 </head>
