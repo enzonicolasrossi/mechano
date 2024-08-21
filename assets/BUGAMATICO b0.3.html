@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUGAMATICO</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            font-family: 'Press Start 2P', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        :root {
+            --background-color: #121212;
+            --text-color: #ffffff;
+            --box-bg-color: #1e1e1e;
+            --border-color: #00FF00;
+        }
+
+        .light-mode {
+            --background-color: #f4f4f4;
+            --text-color: #000000;
+            --box-bg-color: #ffffff;
+            --border-color: #008000;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--border-color);
+        }
+
+        .term-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .label {
+            font-size: 1rem;
+            margin-right: 10px;
+            color: var(--text-color);
+        }
+
+        .text-field {
+            padding: 10px;
+            background-color: var(--box-bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            background-color: var(--border-color);
+            color: var(--background-color);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+        }
+
+        button:active {
+            animation: buttonClick 0.3s ease;
+        }
+
+        @keyframes buttonClick {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background-color: var(--border-color);
+            color: var(--background-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .instagram-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--border-color);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .instagram-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <a href="https://www.instagram.com/enzonicolasrossi/" class="instagram-link">@enzonicolasrossi</a>
+    <button class="toggle-btn" onclick="toggleMode()">Dark/Light Mode</button>
+    <h1>BUGAMATICO</h1>
+
+    <div class="term-row">
+        <span class="label">Quien sos</span>
+        <div class="text-field" id="field1">---</div>
+    </div>
+
+    <div class="term-row">
+        <span class="label">Donde estas</span>
+        <div class="text-field" id="field2">---</div>
+    </div>
+
+    <div class="term-row">
+        <span class="label">Que haces</span>
+        <div class="text-field" id="field3">---</div>
+    </div>
+
+    <button onclick="startAnimation()">IMPRO!!!!</button>
+
+    <script>
+        const terms1 = [
+    'Soy un programador', 'Soy un diseñador', 'Soy un artista', 'Soy un escritor', 'Soy un músico',
+    'Soy un científico', 'Soy un ingeniero', 'Soy un médico', 'Soy un abogado', 'Soy un cocinero',
+    'Soy un deportista', 'Soy un maestro', 'Soy un estudiante', 'Soy un empresario', 'Soy un emprendedor',
+    'Soy un líder', 'Soy un mecánico', 'Soy un agricultor', 'Soy un electricista', 'Soy un plomero',
+    'Soy un carpintero', 'Soy un fontanero', 'Soy un pintor', 'Soy un escultor', 'Soy un fotógrafo',
+    'Soy un productor', 'Soy un periodista', 'Soy un actor', 'Soy un director', 'Soy un camarero',
+    'Soy un bailarín', 'Soy un modelo', 'Soy un piloto', 'Soy un soldado', 'Soy un bombero',
+    'Soy un policía', 'Soy un detective', 'Soy un animador', 'Soy un locutor', 'Soy un editor',
+    'Soy un asesor', 'Soy un consultor', 'Soy un poeta', 'Soy un activista', 'Soy un político',
+    'Soy un diplomático', 'Soy un traductor', 'Soy un comerciante', 'Soy un guardia de seguridad',
+    'Soy un jardinero', 'Soy un científico de datos', 'Soy un enfermero', 'Soy un psiquiatra',
+    'Soy un psicólogo', 'Soy un físico', 'Soy un matemático', 'Soy un astrónomo', 'Soy un biólogo',
+    'Soy un zoólogo', 'Soy un veterinario', 'Soy un entrenador personal', 'Soy un dietista',
+    'Soy un economista', 'Soy un contador', 'Soy un banquero', 'Soy un agente inmobiliario',
+    'Soy un farmacéutico', 'Soy un profesor', 'Soy un arquitecto', 'Soy un arqueólogo',
+    'Soy un geólogo', 'Soy un químico', 'Soy un historiador', 'Soy un lingüista', 'Soy un piloto de carreras',
+    'Soy un ingeniero de software', 'Soy un diseñador de videojuegos', 'Soy un chef de repostería',
+    'Soy un crítico de cine', 'Soy un comediante', 'Soy un influencer', 'Soy un barman', 'Soy un estilista',
+    'Soy un tatuador', 'Soy un detective privado', 'Soy un guardaespaldas', 'Soy un mago', 'Soy un DJ',
+    'Soy un organizador de eventos', 'Soy un escritor de canciones', 'Soy un guionista', 'Soy un decorador de interiores',
+    'Soy un orador motivacional', 'Soy un coach de vida', 'Soy un administrador', 'Soy un bibliotecario',
+    'Soy un astrólogo', 'Soy un tarotista', 'Soy un constructor de muebles', 'Soy un chofer', 'Soy un leñador'
+];
+
+const terms2 = [
+    'Estoy en la oficina', 'Estoy en casa', 'Estoy en el parque', 'Estoy en la playa', 'Estoy en la montaña',
+    'Estoy en el supermercado', 'Estoy en la estación de tren', 'Estoy en la escuela', 'Estoy en el aeropuerto',
+    'Estoy en el cine', 'Estoy en el teatro', 'Estoy en un museo', 'Estoy en un concierto', 'Estoy en un restaurante',
+    'Estoy en un café', 'Estoy en una biblioteca', 'Estoy en un estadio', 'Estoy en un gimnasio', 'Estoy en un hospital',
+    'Estoy en una clínica', 'Estoy en un laboratorio', 'Estoy en una fábrica', 'Estoy en una granja', 'Estoy en un taller',
+    'Estoy en una tienda', 'Estoy en una oficina postal', 'Estoy en un zoológico', 'Estoy en una galería de arte',
+    'Estoy en un centro comercial', 'Estoy en una feria', 'Estoy en una convención', 'Estoy en una reunión', 'Estoy en un ensayo',
+    'Estoy en un partido de fútbol', 'Estoy en una boda', 'Estoy en un funeral', 'Estoy en una fiesta', 'Estoy en un bar',
+    'Estoy en una iglesia', 'Estoy en una catedral', 'Estoy en una mezquita', 'Estoy en un templo', 'Estoy en una embajada',
+    'Estoy en un consulado', 'Estoy en la carretera', 'Estoy en un tren', 'Estoy en un barco', 'Estoy en un avión',
+    'Estoy en el desierto', 'Estoy en la selva', 'Estoy en la tundra', 'Estoy en un mercado', 'Estoy en una estación de autobuses',
+    'Estoy en un campo de golf', 'Estoy en una cancha de baloncesto', 'Estoy en una pista de hielo', 'Estoy en un parque de atracciones',
+    'Estoy en un jardín botánico', 'Estoy en un acuario', 'Estoy en un planetario', 'Estoy en un centro de conferencias',
+    'Estoy en un casino', 'Estoy en un spa', 'Estoy en una piscina', 'Estoy en un hotel', 'Estoy en una casa de campo',
+    'Estoy en un campamento', 'Estoy en un bosque', 'Estoy en una reserva natural', 'Estoy en una cueva', 'Estoy en una torre',
+    'Estoy en un castillo', 'Estoy en una prisión', 'Estoy en una estación de policía', 'Estoy en una clínica veterinaria',
+    'Estoy en una escuela de arte', 'Estoy en un taller de autos', 'Estoy en un mercado de pulgas', 'Estoy en un festival de música',
+    'Estoy en un desfile', 'Estoy en una estación de radio', 'Estoy en una estación de televisión', 'Estoy en una biblioteca pública',
+    'Estoy en una exposición de arte', 'Estoy en una tienda de videojuegos', 'Estoy en una pista de carreras', 'Estoy en un estadio de béisbol',
+    'Estoy en una conferencia', 'Estoy en un zoológico safari', 'Estoy en una pista de esquí', 'Estoy en un parque acuático',
+    'Estoy en un faro', 'Estoy en una fábrica de chocolate', 'Estoy en un observatorio', 'Estoy en un taller de carpintería'
+];
+
+const terms3 = [
+    'Estoy trabajando', 'Estoy estudiando', 'Estoy descansando', 'Estoy cocinando', 'Estoy comiendo',
+    'Estoy bebiendo', 'Estoy leyendo', 'Estoy escribiendo', 'Estoy tocando música', 'Estoy cantando',
+    'Estoy bailando', 'Estoy caminando', 'Estoy corriendo', 'Estoy nadando', 'Estoy buceando',
+    'Estoy pescando', 'Estoy cazando', 'Estoy explorando', 'Estoy jugando videojuegos', 'Estoy viendo una película',
+    'Estoy viendo una serie', 'Estoy meditando', 'Estoy durmiendo', 'Estoy lavando platos', 'Estoy limpiando',
+    'Estoy pintando', 'Estoy dibujando', 'Estoy haciendo ejercicio', 'Estoy esquiando', 'Estoy escalando',
+    'Estoy haciendo yoga', 'Estoy arreglando algo', 'Estoy construyendo algo', 'Estoy programando', 'Estoy diseñando',
+    'Estoy negociando', 'Estoy dando una presentación', 'Estoy hablando por teléfono', 'Estoy escribiendo correos',
+    'Estoy organizando', 'Estoy reparando', 'Estoy sembrando', 'Estoy cosechando', 'Estoy recogiendo frutas',
+    'Estoy cuidando animales', 'Estoy comprando', 'Estoy vendiendo', 'Estoy navegando por internet', 'Estoy rezando',
+    'Estoy filosofando', 'Estoy enseñando', 'Estoy entrenando', 'Estoy cultivando plantas', 'Estoy paseando al perro',
+    'Estoy haciendo jardinería', 'Estoy cuidando a mis hijos', 'Estoy planeando un viaje', 'Estoy editando fotos',
+    'Estoy creando un sitio web', 'Estoy grabando un video', 'Estoy desarrollando una app', 'Estoy investigando un tema',
+    'Estoy resolviendo un problema matemático', 'Estoy escribiendo un blog', 'Estoy jugando ajedrez', 'Estoy tejiendo',
+    'Estoy cosiendo', 'Estoy reparando una bicicleta', 'Estoy tomando un café', 'Estoy bebiendo un té', 'Estoy haciendo pan',
+    'Estoy pintando una habitación', 'Estoy decorando mi casa', 'Estoy jugando al tenis', 'Estoy jugando al fútbol',
+    'Estoy leyendo poesía', 'Estoy escribiendo una novela', 'Estoy grabando un podcast', 'Estoy revisando mis redes sociales',
+    'Estoy planificando un evento', 'Estoy probando una receta nueva', 'Estoy construyendo una maqueta', 'Estoy volando un dron',
+    'Estoy organizando una fiesta', 'Estoy arreglando un coche', 'Estoy pintando una miniatura', 'Estoy jugando juegos de mesa',
+    'Estoy resolviendo un rompecabezas', 'Estoy arreglando mi computadora', 'Estoy plantando flores', 'Estoy escribiendo una carta',
+    'Estoy editando un documento', 'Estoy creando una presentación', 'Estoy organizando un archivo', 'Estoy observando aves',
+    'Estoy haciendo una meditación guiada', 'Estoy haciendo malabares', 'Estoy cocinando al aire libre'
+];
+
+
+        let animationInterval;
+
+        function getRandomTerm(terms) {
+            const randomIndex = Math.floor(Math.random() * terms.length);
+            return terms[randomIndex];
+        }
+
+        function animateFields() {
+            document.getElementById('field1').textContent = getRandomTerm(terms1);
+            document.getElementById('field2').textContent = getRandomTerm(terms2);
+            document.getElementById('field3').textContent = getRandomTerm(terms3);
+        }
+
+        function startAnimation() {
+            animationInterval = setInterval(animateFields, 100);
+
+            setTimeout(() => {
+                clearInterval(animationInterval);
+                generateRandomTerms();
+            }, 2000);
+        }
+
+        function generateRandomTerms() {
+            document.getElementById('field1').textContent = getRandomTerm(terms1);
+            document.getElementById('field2').textContent = getRandomTerm(terms2);
+            document.getElementById('field3').textContent = getRandomTerm(terms3);
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle('light-mode');
+        }
+    </script>
+<br>
+<br>
+Toda historia necesita un personaje, un lugar y una accion, dale al botoncito y practica, yo que se, hacete cargo.
+
+</body>
+</html>
