@@ -40,15 +40,15 @@
       margin: 0;
     }
 
-    /* Menu Box and App List */
-    .menu-box {
+    /* App List and Social Links */
+    .app-list {
+      margin-top: 30px;
       display: flex;
       flex-direction: column;
       gap: 20px;
-      align-items: center;
     }
 
-    .menu-item, .app-list-item {
+    .app-list-item {
       background-color: #fff;
       color: #000;
       padding: 15px 30px;
@@ -60,18 +60,11 @@
       transition: transform 0.3s ease;
     }
 
-    .menu-item:hover, .app-list-item:hover {
+    .app-list-item:hover {
       background-color: #000;
       color: #fff;
       border-color: #fff;
       transform: scale(1.05);
-    }
-
-    .app-list {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
     }
   </style>
 </head>
@@ -82,19 +75,14 @@
       <h1>MECHA.NO</h1>
     </header>
 
-    <!-- Main Menu Box -->
-    <main class="menu-box">
-      <a href="#apps" class="menu-item">APPS</a>
-      <a href="art.html" class="menu-item">ART</a>
-      <a href="texts.html" class="menu-item">TEXTS</a>
-      <a href="shop.html" class="menu-item">SHOP</a>
-    </main>
-
-    <!-- App List (always visible) -->
-    <div id="apps" class="app-list">
+    <!-- List of Apps and Social Links -->
+    <div class="app-list">
       <a href="BUGAMATICO.html" class="app-list-item">BUGAMATICO</a>
       <a href="Monster_Maker.html" class="app-list-item">Monster Maker</a>
       <a href="https://dhis2.org" class="app-list-item" target="_blank">DHIS2</a>
+      <a href="https://www.instagram.com/hagalazofficial/" class="app-list-item" target="_blank">HAGALAZ</a>
+      <a href="https://www.instagram.com/enzonicolasrossi" class="app-list-item" target="_blank">ENZO</a>
+      <a href="https://www.instagram.com/angenoide" class="app-list-item" target="_blank">ANGELO</a>
     </div>
   </div>
 </body>
