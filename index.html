@@ -13,7 +13,7 @@
       display: none;
       list-style-type: none;
       padding: 0;
-      margin-top: 20px;
+      margin: 20px 0 0 0;
     }
     .app-list li {
       margin: 10px 0;
@@ -22,9 +22,25 @@
       color: #fff;
       text-decoration: none;
       font-size: 18px;
+      background-color: #000;
+      padding: 10px 20px;
+      display: block;
+      border: 3px solid #fff;
+      text-align: center;
+      transition: background-color 0.3s, transform 0.3s;
     }
     .app-list a:hover {
-      text-decoration: underline;
+      background-color: #fff;
+      color: #000;
+      transform: scale(1.05);
+    }
+    /* Transition for app list sliding down */
+    .fade {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .fade.show {
+      opacity: 1;
     }
   </style>
 </head>
@@ -42,8 +58,8 @@
       <a href="texts.html" class="menu-item">TEXTS</a>
       <a href="shop.html" class="menu-item">SHOP</a>
       
-      <!-- App List (Initially Hidden) -->
-      <ul id="appList" class="app-list">
+      <!-- App List (Initially Hidden with Fade Transition) -->
+      <ul id="appList" class="app-list fade">
         <li><a href="BUGAMATICO.html">BUGAMATICO</a></li>
         <li><a href="Monster_Maker.html">Monster Maker</a></li>
         <li><a href="https://dhis2.org" target="_blank">DHIS2</a></li>
@@ -51,10 +67,11 @@
     </main>
   </div>
 
-  <!-- JavaScript to Toggle App List -->
+  <!-- JavaScript to Toggle App List with Fade Effect -->
   <script>
     function toggleApps() {
       const appList = document.getElementById('appList');
+      appList.classList.toggle('show');
       if (appList.style.display === 'none' || appList.style.display === '') {
         appList.style.display = 'block';
       } else {
