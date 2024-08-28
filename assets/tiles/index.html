@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystic Image Grid</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        #controls {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background: #111;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        #gridSizeSlider {
+            width: 80%;
+            height: 15px;
+            -webkit-appearance: none;
+            background: #444;
+            border-radius: 10px;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        #gridSizeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #fff, #0ff);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        }
+
+        #gridSizeSlider::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #fff, #0ff);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+        }
+
+        #gridSizeNumber {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #0ff;
+            margin-bottom: 10px;
+        }
+
+        #exportButton {
+            margin-top: 20px;
+            padding: 10px 40px;
+            background-color: #0ff;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-gap: 0;
+            max-width: 90vw;
+            max-height: 90vh;
+            margin-top: 100px; /* Offset to avoid overlay with slider */
+            background-color: #fff; /* Set the grid background to white */
+        }
+
+        .grid img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        canvas {
+            display: none; /* Hide the canvas element */
+        }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <span id="gridSizeNumber">7</span>x<span id="gridSizeNumber2">7</span>
+        <input type="range" id="gridSizeSlider" min="2" max="26" value="7">
+        <button id="exportButton">EXPORT</button>
+    </div>
+
+    <div class="grid" id="image-grid">
+        <!-- Images will be dynamically inserted here -->
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const grid = document.getElementById('image-grid');
+        const gridSizeNumber = document.getElementById('gridSizeNumber');
+        const gridSizeNumber2 = document.getElementById('gridSizeNumber2');
+        const gridSizeSlider = document.getElementById('gridSizeSlider');
+        const exportButton = document.getElementById('exportButton');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const totalImages = 110; // Number of images available (now 110 images)
+
+        let currentGridSize = 7;
+
+        // Function to shuffle an array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Function to create the grid with randomized images
+        function createGrid(size) {
+            grid.innerHTML = ''; // Clear the grid
+            currentGridSize = size;
+            grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`; // Set the number of columns
+            const gridSize = size * size; // Total number of grid cells
+
+            // Create an array with the image numbers (1 to 110)
+            let imageNumbers = [];
+            for (let i = 1; i <= totalImages; i++) {
+                imageNumbers.push(i);
+            }
+
+            // Shuffle the array
+            shuffle(imageNumbers);
+
+            // Loop to add images to the grid, repeating shuffled images if needed
+            for (let i = 0; i < gridSize; i++) {
+                const imgNum = imageNumbers[i % totalImages]; // Pick the image number from the shuffled array
+                const img = document.createElement('img');
+                img.src = `images/A (${imgNum}).png`;
+                img.alt = `Image A (${imgNum})`;
+                grid.appendChild(img);
+            }
+        }
+
+        // Function to export the grid as PNG
+        function exportGridAsPng() {
+            const images = Array.from(grid.querySelectorAll('img'));
+            const imgSize = images[0].naturalWidth; // Assume all images are square and have the same size
+
+            // Set canvas size based on grid dimensions
+            canvas.width = currentGridSize * imgSize;
+            canvas.height = currentGridSize * imgSize;
+
+            let loadedImages = 0;
+
+            // Ensure all images are fully loaded before drawing them to canvas
+            images.forEach((img, index) => {
+                const imageElement = new Image();
+                imageElement.src = img.src;
+                imageElement.onload = function () {
+                    loadedImages++;
+                    const x = (index % currentGridSize) * imgSize;
+                    const y = Math.floor(index / currentGridSize) * imgSize;
+                    ctx.drawImage(imageElement, x, y, imgSize, imgSize);
+
+                    // Once all images are loaded, export the canvas as a PNG
+                    if (loadedImages === images.length) {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const link = document.createElement('a');
+                        link.href = dataUrl;
+                        link.download = 'grid.png';
+                        link.click();
+                    }
+                };
+            });
+        }
+
+        // Event listener for slider changes
+        gridSizeSlider.addEventListener('input', (event) => {
+            const size = event.target.value;
+            gridSizeNumber.textContent = size;
+            gridSizeNumber2.textContent = size;
+            createGrid(size);
+        });
+
+        // Event listener for the export button
+        exportButton.addEventListener('click', exportGridAsPng);
+
+        // Initialize the grid with the default size
+        createGrid(7);
+    </script>
+</body>
+</html>
