@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Resources</title>
+
+    <!-- Google Fonts: Press Start 2P -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        :root {
+            --background-color: #87cefa;
+            --text-color: #333;
+            --button-color: #ffcc00;
+            --button-text-color: white;
+            --button-border-color: #ff3333;
+            --button-shadow-color: #cc0000;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --button-color: #ff3333;
+            --button-text-color: #fff;
+            --button-border-color: #ffcc00;
+            --button-shadow-color: #ffae00;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            text-shadow: 2px 2px #fff, 4px 4px var(--text-color);
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        h1 span {
+            display: block;
+            line-height: 1;
+        }
+
+        h1 span:first-child {
+            font-size: 48px;
+        }
+
+        h1 span:last-child {
+            font-size: 64px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            background-color: var(--background-color);
+            border: 5px solid var(--button-border-color);
+            border-radius: 20px;
+            padding: 30px;
+            width: 600px;
+            max-width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .nintendo-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: 5px solid var(--button-border-color);
+            border-radius: 50px;
+            box-shadow: 0 8px var(--button-shadow-color), 0 16px rgba(0, 0, 0, 0.3);
+            margin: 10px 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 1px #333;
+        }
+
+        .nintendo-button.prominent {
+            padding: 15px 30px;
+            font-size: 18px;
+        }
+
+        .nintendo-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px var(--button-shadow-color), 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nintendo-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px var(--button-shadow-color), 0 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .resources-links {
+            margin-top: 20px;
+        }
+
+        .resources-links a {
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .language-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .language-button {
+            padding: 8px 15px;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: 3px solid var(--button-border-color);
+            border-radius: 10px;
+            margin: 0 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 1px #333;
+            text-align: center;
+        }
+
+        .language-button.active {
+            background-color: var(--button-border-color);
+            color: white;
+        }
+
+        /* Back button style */
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 24px;
+            text-decoration: none;
+            color: var(--button-text-color);
+            background-color: var(--button-color);
+            padding: 10px 15px;
+            border-radius: 50%;
+            border: 5px solid var(--button-border-color);
+            box-shadow: 0 8px var(--button-shadow-color), 0 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px var(--button-shadow-color), 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px var(--button-shadow-color), 0 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="page-title">
+        <span>Classroom</span>
+        <span>Resources</span>
+    </h1>
+
+    <div class="content">
+        <h2 id="exercise-title">How to Run the Exercise</h2>
+        <div id="content-text">
+            <!-- Default English content -->
+            <p>Use the Monster Maker game as an interactive exercise to engage students' creativity and critical thinking. The game involves creating unique monsters by combining different body parts and features, fostering imagination and teamwork.</p>
+            <p>Encourage students to collaborate and explain the choices behind the monsters they create, promoting language skills and group discussion.</p>
+            <p><strong>Classroom resources:</strong></p>
+        </div>
+
+        <div class="resources-links">
+            <a href="booklet.pdf" class="nintendo-button" id="bookletBtn">Classroom Booklet</a>
+            <a href="printable_cards.pdf" class="nintendo-button" id="cardsBtn">Printable Cards</a>
+            <a href="exercise_guide.pdf" class="nintendo-button" id="exerciseBtn">How to Run the Exercise</a>
+        </div>
+    </div>
+
+    <!-- Language buttons below the content frame -->
+    <div class="language-buttons">
+        <button class="language-button" id="btn-en" onclick="setLanguage('en')">English</button>
+        <button class="language-button" id="btn-es" onclick="setLanguage('es')">Español</button>
+        <button class="language-button" id="btn-no" onclick="setLanguage('no')">Norsk</button>
+    </div>
+
+    <a href="index.html" class="back-button">←</a>
+
+    <script>
+        const contentText = {
+            en: {
+                title: 'Classroom Resources',
+                exerciseTitle: 'How to Run the Exercise',
+                text: `<p>Use the Monster Maker game as an interactive exercise to engage students' creativity and critical thinking. The game involves creating unique monsters by combining different body parts and features, fostering imagination and teamwork.</p>
+                       <p>Encourage students to collaborate and explain the choices behind the monsters they create, promoting language skills and group discussion.</p>
+                       <p><strong>Classroom resources:</strong></p>`,
+                buttons: {
+                    booklet: 'Classroom Booklet',
+                    cards: 'Printable Cards',
+                    exercise: 'How to Run the Exercise'
+                }
+            },
+            es: {
+                title: 'Recursos',
+                exerciseTitle: 'Cómo realizar el ejercicio',
+                text: `<p>Usa el juego Monster Maker como un ejercicio interactivo para estimular la creatividad y el pensamiento crítico de los estudiantes. El juego consiste en crear monstruos únicos combinando diferentes partes del cuerpo y características, fomentando la imaginación y el trabajo en equipo.</p>
+                       <p>Anima a los estudiantes a colaborar y explicar las elecciones detrás de los monstruos que crean, promoviendo las habilidades lingüísticas y la discusión grupal.</p>
+                       <p><strong>Recursos para maestros:</strong></p>`,
+                buttons: {
+                    booklet: 'Folleto para el Aula',
+                    cards: 'Tarjetas Imprimibles',
+                    exercise: 'Cómo realizar el ejercicio'
+                }
+            },
+            no: {
+                title: 'Ressurser',
+                exerciseTitle: 'Slik gjennomfører du øvelsen',
+                text: `<p>Bruk Monster Maker-spillet som en interaktiv øvelse for å engasjere elevenes kreativitet og kritiske tenkning. Spillet går ut på å lage unike monstre ved å kombinere ulike kroppsdeler og funksjoner, noe som fremmer fantasi og samarbeid.</p>
+                       <p>Oppmuntre elevene til å samarbeide og forklare valgene bak monstrene de lager, noe som fremmer språkferdigheter og gruppediskusjon.</p>
+                       <p><strong>Ressurser for lærere:</strong></p>`,
+                buttons: {
+                    booklet: 'Klasseromshefte',
+                    cards: 'Utskrivbare Kort',
+                    exercise: 'Slik gjennomfører du øvelsen'
+                }
+            }
+        };
+
+        function setLanguage(language) {
+            document.getElementById("page-title").innerHTML = `<span>${contentText[language].title.split(' ')[0]}</span><span>${contentText[language].title.split(' ')[1]}</span>`;
+            document.getElementById("exercise-title").textContent = contentText[language].exerciseTitle;
+            document.getElementById("content-text").innerHTML = contentText[language].text;
+            document.getElementById("bookletBtn").textContent = contentText[language].buttons.booklet;
+            document.getElementById("cardsBtn").textContent = contentText[language].buttons.cards;
+            document.getElementById("exerciseBtn").textContent = contentText[language].buttons.exercise;
+        }
+
+        // Set default language
+        setLanguage('en');
+    </script>
+
+</body>
+</html>
