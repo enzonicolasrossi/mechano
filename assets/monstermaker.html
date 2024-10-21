@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monster Maker</title>
 
-    <!-- Google Fonts: Press Start 2P for a retro Nintendo-like look -->
+    <!-- Google Fonts: Press Start 2P  -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <style>
@@ -342,23 +342,85 @@
     <script>
         let currentLanguage = 'en';
         let isAdvancedMode = false;
+    
+        const currentFields = { body: '', head: '', limbs: '', specialFeature: '', size: '' };
+    
+        const termMapping = {
+    // Limbs
+    'fanged': { es: 'colmillos', no: 'med hoggtenner' },
+    'clawed': { es: 'garras', no: 'med klør' },
+    'horned': { es: 'cuernos', no: 'med horn' },
+    'spiked': { es: 'pinchos', no: 'piggene' },
+    'hoofs': { es: 'pezuñas', no: 'hover' },
+    'long tongue': { es: 'lengua larga', no: 'lang tunge' },
+    'beak': { es: 'pico', no: 'nebb' },
+    'fins': { es: 'aletas', no: 'finner' },
+    'snout': { es: 'hocico', no: 'snute' },
+    'trunk': { es: 'trompa', no: 'snabel' },
+    'antennae': { es: 'antenas', no: 'antenner' },
+    'stinger': { es: 'aguijón', no: 'brodd' },
 
+    // Head
+    'feathered wings': { es: 'alas aplumadas', no: 'fjærkledde vinger' },
+    'web-spinning': { es: 'telaraña', no: 'spinner nett' },
+    'fire-breathing': { es: 'escupe-fuego', no: 'puster ild' },
+    'tentacled': { es: 'tentáculos', no: 'med tentakler' },
+    'webbed fingers': { es: 'dedos palmeados', no: 'svømmehud mellom fingrene' },
+    'multiple arms': { es: 'muchos brazos', no: 'flere armer' },
+    'elongated limbs': { es: 'extremidades alargadas', no: 'forlengede lemmer' },
+    'suction-cupped limbs': { es: 'extremidades con ventosas', no: 'sugekopper på lemmer' },
+    'segmented legs': { es: 'piernas segmentadas', no: 'segmenterte ben' },
+    'multiple eyes': { es: 'muchos ojos', no: 'mange øyne' },
+    'insect wings': { es: 'alas de insecto', no: 'insektvinger' },
+    'bat wings': { es: 'alas de murciélago', no: 'flaggermusvinger' },
+    'floating': { es: 'flotante', no: 'svevende' },
+
+    // Body
+    'fur-covered': { es: 'cubierto de pelaje', no: 'pelsdekket' },
+    'armored': { es: 'armadura', no: 'panser' },
+    'winged arms': { es: 'brazos alados', no: 'bevingede armer' },
+    'feathered': { es: 'plumas', no: 'fjærkledd' },
+    'scaled': { es: 'escamas', no: 'skjellkledd' },
+    'stone body': { es: 'cuerpo de piedra', no: 'steinkropp' },
+    'elastic body': { es: 'cuerpo elástico', no: 'elastisk kropp' },
+    'plant body': { es: 'cuerpo de planta', no: 'plantekropp' },
+    'humanoid': { es: 'humanoide', no: 'humanoid' },
+    'robotic': { es: 'robótico', no: 'robotisk' },
+    'skeletal': { es: 'esquelético', no: 'skjelettaktig' },
+    'slimy': { es: 'pegajoso', no: 'slimete' },
+
+    // Special
+    'muscular': { es: 'musculoso', no: 'muskuløs' },
+    'venomous': { es: 'venenoso', no: 'giftig' },
+    'camouflage': { es: 'camuflado', no: 'kamuflert' },
+    'nocturnal': { es: 'nocturno', no: 'nattaktiv' },
+    'aquatic': { es: 'acuático', no: 'akvatisk' },
+    'quadrupedal': { es: 'cuadrúpedo', no: 'firbeint' },
+    'cute': { es: 'adorable', no: 'søt' },
+    'gross': { es: 'asqueroso', no: 'ekkel' },
+    'scary': { es: 'aterrador', no: 'skummel' },
+    'friendly': { es: 'amigable', no: 'vennlig' },
+    'aggressive': { es: 'agresivo', no: 'aggressiv' },
+    'amphibious': { es: 'amfibio', no: 'amfibisk' }
+};
+
+    
         const monsterData = {
             en: {
                 bodyOptions: {
-                    basic: ['scaly', 'furry', 'slimy'],
+                    basic: ['scaly', 'furry', 'slimy', 'fur-covered', 'armored', 'winged arms', 'feathered', 'scaled', 'stone body', 'elastic body', 'plant body', 'humanoid', 'robotic', 'skeletal', 'slimy'],
                     advanced: ['rocky', 'metallic', 'crystalline']
                 },
                 headOptions: {
-                    basic: ['dragon-like', 'humanoid', 'skull'],
+                    basic: ['dragon-like', 'humanoid', 'skull', 'feathered wings', 'web-spinning', 'fire-breathing', 'tentacled', 'webbed fingers', 'multiple arms', 'elongated limbs', 'suction-cupped limbs', 'segmented legs', 'multiple eyes', 'insect wings', 'bat wings', 'floating'],
                     advanced: ['multiple-eyed', 'horned', 'tentacled']
                 },
                 limbsOptions: {
-                    basic: ['tentacles', 'clawed arms', 'wings'],
+                    basic: ['tentacles', 'clawed arms', 'wings', 'fanged', 'clawed', 'horned', 'spiked', 'hoofs', 'long tongue', 'beak', 'fins', 'snout', 'trunk', 'antennae', 'stinger'],
                     advanced: ['hooves', 'multiple legs', 'robotic limbs']
                 },
                 specialFeatureOptions: {
-                    basic: ['breathes fire', 'glows in the dark', 'invisible'],
+                    basic: ['breathes fire', 'glows in the dark', 'invisible', 'muscular', 'venomous', 'camouflage', 'nocturnal', 'aquatic', 'quadrupedal', 'cute', 'gross', 'scary', 'friendly', 'aggressive', 'amphibious'],
                     advanced: ['regenerates', 'teleports', 'mind control']
                 },
                 sizeOptions: {
@@ -376,19 +438,19 @@
             },
             es: {
                 bodyOptions: {
-                    basic: ['escamoso', 'peludo', 'viscoso'],
+                    basic: ['escamoso', 'peludo', 'viscoso', 'cubierto de pelaje', 'armadura', 'brazos alados', 'plumas', 'escamas', 'cuerpo de piedra', 'cuerpo elástico', 'cuerpo de planta', 'humanoide', 'robótico', 'esquelético', 'pegajoso'],
                     advanced: ['rocoso', 'metálico', 'cristalino']
                 },
                 headOptions: {
-                    basic: ['parecido a un dragón', 'humanoide', 'calavera'],
+                    basic: ['parecido a un dragón', 'humanoide', 'calavera', 'alas aplumadas', 'telaraña', 'escupe-fuego', 'tentáculos', 'dedos palmeados', 'muchos brazos', 'extremidades alargadas', 'extremidades con ventosas', 'piernas segmentadas', 'muchos ojos', 'alas de insecto', 'alas de murciélago', 'flotante'],
                     advanced: ['con múltiples ojos', 'cornudo', 'tentáculos']
                 },
                 limbsOptions: {
-                    basic: ['tentáculos', 'brazos con garras', 'alas'],
+                    basic: ['tentáculos', 'brazos con garras', 'alas', 'colmillos', 'garras', 'cuernos', 'pinchos', 'pezuñas', 'lengua larga', 'pico', 'aletas', 'hocico', 'trompa', 'antenas', 'aguijón'],
                     advanced: ['pezuñas', 'múltiples patas', 'extremidades robóticas']
                 },
                 specialFeatureOptions: {
-                    basic: ['lanza fuego', 'brilla en la oscuridad', 'invisible'],
+                    basic: ['lanza fuego', 'brilla en la oscuridad', 'invisible', 'musculoso', 'venenoso', 'camuflado', 'nocturno', 'acuático', 'cuadrúpedo', 'adorable', 'asqueroso', 'aterrador', 'amigable', 'agresivo', 'amfibio'],
                     advanced: ['regenera', 'teletransporta', 'control mental']
                 },
                 sizeOptions: {
@@ -406,19 +468,19 @@
             },
             no: {
                 bodyOptions: {
-                    basic: ['skjellete', 'lodden', 'slimete'],
+                    basic: ['skjellete', 'lodden', 'slimete', 'pelsdekket', 'panser', 'bevingede armer', 'fjærkledd', 'skjellkledd', 'steinkropp', 'elastisk kropp', 'plantekropp', 'humanoid', 'robotisk', 'skjelettaktig', 'slimete'],
                     advanced: ['steinete', 'metallisk', 'krystallinsk']
                 },
                 headOptions: {
-                    basic: ['drage-lignende', 'menneskelig', 'hodeskalle'],
+                    basic: ['drage-lignende', 'menneskelig', 'hodeskalle', 'fjærkledde vinger', 'spinner nett', 'puster ild', 'med tentakler', 'svømmehud mellom fingrene', 'flere armer', 'forlengede lemmer', 'sugekopper på lemmer', 'segmenterte ben', 'mange øyne', 'insektvinger', 'flaggermusvinger', 'svevende'],
                     advanced: ['flereøyet', 'hornet', 'tentakler']
                 },
                 limbsOptions: {
-                    basic: ['tentakler', 'klør', 'vinger'],
+                    basic: ['tentakler', 'klør', 'vinger', 'med hoggtenner', 'med klør', 'med horn', 'piggene', 'hover', 'lang tunge', 'nebb', 'finner', 'snute', 'snabel', 'antenner', 'brodd'],
                     advanced: ['hover', 'flere ben', 'robotlemmer']
                 },
                 specialFeatureOptions: {
-                    basic: ['puster ild', 'lyser i mørket', 'usynlig'],
+                    basic: ['puster ild', 'lyser i mørket', 'usynlig', 'muskuløs', 'giftig', 'kamuflert', 'nattaktiv', 'akvatisk', 'firbeint', 'søt', 'ekkel', 'skummel', 'vennlig', 'aggressiv', 'amfibisk'],
                     advanced: ['regenererer', 'teleporterer', 'tankekontroll']
                 },
                 sizeOptions: {
@@ -435,61 +497,72 @@
                 }
             }
         };
-
+    
         function getRandomItem(list) {
             return list[Math.floor(Math.random() * list.length)];
         }
-
+    
+        function translateField(fieldKey, language) {
+            const currentOption = currentFields[fieldKey];
+            // Check for term mapping and fallback to the same term if no translation is found
+            if (currentOption && termMapping[currentOption] && termMapping[currentOption][language]) {
+                return termMapping[currentOption][language];
+            }
+            return currentOption; // If no translation is found, return the current option
+        }
+    
         function populateFields() {
             const languageData = monsterData[currentLanguage];
             const mode = isAdvancedMode ? 'advanced' : 'basic';
-            
+    
+            // Generate new terms regardless of the previous selection
             const fields = [
-                { id: "field1", option: getRandomItem(languageData.bodyOptions[mode]) },
-                { id: "field2", option: getRandomItem(languageData.headOptions[mode]) },
-                { id: "field3", option: getRandomItem(languageData.limbsOptions[mode]) },
-                { id: "field4", option: getRandomItem(languageData.specialFeatureOptions[mode]) },
-                { id: "field5", option: getRandomItem(languageData.sizeOptions[mode]) },
+                { id: "field1", key: 'body', option: getRandomItem(languageData.bodyOptions[mode]) },
+                { id: "field2", key: 'head', option: getRandomItem(languageData.headOptions[mode]) },
+                { id: "field3", key: 'limbs', option: getRandomItem(languageData.limbsOptions[mode]) },
+                { id: "field4", key: 'specialFeature', option: getRandomItem(languageData.specialFeatureOptions[mode]) },
+                { id: "field5", key: 'size', option: getRandomItem(languageData.sizeOptions[mode]) }
             ];
-
+    
             fields.forEach(field => {
                 const element = document.getElementById(field.id);
                 element.classList.add('spin');
                 setTimeout(() => {
                     element.textContent = `${field.option}`;
+                    currentFields[field.key] = field.option;
                     element.classList.remove('spin');
                 }, 1500);
             });
         }
-
+    
         function toggleMode() {
             isAdvancedMode = document.getElementById("modeToggleSwitch").checked;
-            populateFields();
+            populateFields(); // Repopulate fields when toggling the mode
         }
-
+    
         function setLanguage(language) {
             currentLanguage = language;
             const languageData = monsterData[currentLanguage];
-
+    
             document.getElementById("title").innerHTML = `
                 <span>${languageData.labels.title.split(' ')[0]}</span>
                 <span>${languageData.labels.title.split(' ')[1]}</span>
             `;
-
+    
             document.getElementById("createMonsterBtn").textContent = languageData.labels.createButton;
             document.getElementById("resourcesLink").href = languageData.labels.resourcesLink;
             document.getElementById("resourcesLink").querySelector('button').textContent = languageData.labels.classroomResources;
             document.getElementById("buyLink").href = languageData.labels.buyLink;
             document.getElementById("buyLink").querySelector('button').textContent = languageData.labels.buyGame;
-
+    
             document.querySelectorAll('.language-button').forEach(button => {
                 button.classList.remove('active');
             });
             document.getElementById(`btn-${language}`).classList.add('active');
-
-            populateFields();
+    
+            populateFields(); // Repopulate fields when switching languages
         }
-
+    
         function toggleDarkMode() {
             const body = document.body;
             if (body.getAttribute('data-theme') === 'dark') {
@@ -498,10 +571,12 @@
                 body.setAttribute('data-theme', 'dark');
             }
         }
-
+    
         // Initialize with English as the default language and basic mode
         setLanguage('en');
     </script>
+    
+    
 </body>
 </html>
 
