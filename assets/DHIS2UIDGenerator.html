@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DHIS2 UID Generator</title>
+  <!-- Import a pixel-style retro font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    /* Global retro styling */
+    body {
+      font-family: 'Press Start 2P', cursive;
+      background-color: #000;
+      color: #0f0;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    /* Form styling */
+    label {
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    input[type="number"] {
+      font-size: 16px;
+      padding: 5px;
+      width: 50px;
+      text-align: center;
+      margin-right: 10px;
+    }
+    button {
+      font-size: 16px;
+      padding: 5px 10px;
+      margin: 10px 5px;
+      background: #111;
+      color: #0f0;
+      border: 2px solid #0f0;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    button:hover {
+      background: #0f0;
+      color: #000;
+    }
+    /* Table styling */
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 2px solid #0f0;
+      padding: 10px;
+      font-size: 14px;
+      word-break: break-all;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 18px;
+      }
+      button, input[type="number"] {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>DHIS2 UID Generator</h1>
+    <div>
+      <label for="uidCount">Number of UIDs (1–100):</label>
+      <input type="number" id="uidCount" min="1" max="100" value="10">
+      <button id="generateBtn">Generate UIDs</button>
+      <button id="downloadBtn" style="display: none;">Download CSV</button>
+    </div>
+    <table id="uidTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>UID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Generated UIDs will appear here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Generates a single UID with 11 random characters (A–Z and 0–9)
+    function generateUID() {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let uid = '';
+      for (let i = 0; i < 11; i++) {
+        uid += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return uid;
+    }
+
+    // Generates an array of UIDs
+    function generateUIDs(count) {
+      const uids = [];
+      for (let i = 0; i < count; i++) {
+        uids.push(generateUID());
+      }
+      return uids;
+    }
+
+    // Displays the UIDs in the table
+    function displayUIDs(uids) {
+      const table = document.getElementById('uidTable');
+      const tbody = table.querySelector('tbody');
+      tbody.innerHTML = ''; // Clear previous entries
+      uids.forEach(uid => {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.textContent = uid;
+        row.appendChild(cell);
+        tbody.appendChild(row);
+      });
+      table.style.display = 'table';
+      // Show the Download CSV button
+      document.getElementById('downloadBtn').style.display = 'inline-block';
+    }
+
+    // Creates CSV content from the UID list and triggers a download
+    function downloadCSV(uids) {
+      let csvContent = "data:text/csv;charset=utf-8,UID\n";
+      uids.forEach(uid => {
+        csvContent += uid + "\n";
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "uids.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Event listener for generating UIDs
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const count = parseInt(document.getElementById('uidCount').value, 10);
+      if (isNaN(count) || count < 1 || count > 100) {
+        alert("Please enter a number between 1 and 100");
+        return;
+      }
+      const uids = generateUIDs(count);
+      displayUIDs(uids);
+    });
+
+    // Event listener for downloading the CSV
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const tbody = document.getElementById('uidTable').querySelector('tbody');
+      const rows = tbody.querySelectorAll('tr');
+      const uids = Array.from(rows).map(row => row.firstChild.textContent);
+      downloadCSV(uids);
+    });
+  </script>
+</body>
+</html>
