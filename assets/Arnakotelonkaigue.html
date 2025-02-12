@@ -2,29 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Scientific Starsign Generator</title>
+  <title>Arnakotelonkaigue</title>
   <!-- Leaflet CSS for the map selector -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
+    /* Global Styles */
     body {
       font-family: sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    /* Form Styles */
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
     form div {
       margin-bottom: 15px;
     }
-    .glyph {
-      width: 64px;
-      height: 64px;
-      margin: 5px;
+    #map {
+      height: 300px;
+      width: 100%;
+      margin: 0 auto;
     }
-    #starsign {
-      display: flex;
-      flex-wrap: wrap;
-      max-width: 400px;
+    /* Progress Bar */
+    #progressContainer {
+      display: none;
       margin-top: 20px;
     }
-    /* Progress Bar Styles */
     #progressBarContainer {
       width: 100%;
       background-color: #ddd;
@@ -35,61 +53,99 @@
       height: 100%;
       background-color: #4caf50;
     }
-    /* Map container styling */
-    #map {
-      height: 300px;
-      margin-bottom: 10px;
+    /* Sign Styles */
+    #signContainer {
+      display: none;
+      margin-top: 20px;
+    }
+    #glyphGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      max-width: 300px;
+      margin: 0 auto 10px auto;
+    }
+    .glyphWrapper {
+      border: 2px solid black;
+      padding: 5px;
+      background-color: white;
+    }
+    .glyphWrapper img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    /* Button Styling */
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+      #map {
+        height: 200px;
+      }
+      #glyphGrid {
+        max-width: 200px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Scientific Starsign Generator</h1>
-  <p>Enter your scientific birth details to generate your unique starsign.</p>
-  
-  <!-- The Questions Form -->
-  <form id="starsignForm">
-    <div>
-      <label for="birthDate">Enter your date of birth:</label><br>
-      <input type="date" id="birthDate" name="birthDate" required>
+  <div class="container">
+    <h1>Arnakotelonkaigue</h1>
+    <p>Enter your scientific birth details to generate your unique Arnakotelonkaigue sign.</p>
+
+    <!-- Form for Birth Details -->
+    <form id="starsignForm">
+      <div>
+        <label for="birthDate">Enter your date of birth:</label><br>
+        <input type="date" id="birthDate" name="birthDate" required>
+      </div>
+      <div>
+        <label for="birthTime">Enter your time of birth:</label><br>
+        <input type="time" id="birthTime" name="birthTime" required>
+      </div>
+      <div>
+        <label>Select your location of birth:</label><br>
+        <div id="map"></div>
+        <!-- Hidden input to store the selected coordinates -->
+        <input type="hidden" id="birthLocation" name="birthLocation">
+        <p>Click on the map to choose your birth location.</p>
+      </div>
+      <button type="submit">Generate Arnakotelonkaigue Sign</button>
+    </form>
+
+    <!-- Progress Bar -->
+    <div id="progressContainer">
+      <p>Processing your answers with science...</p>
+      <div id="progressBarContainer">
+        <div id="progressBar"></div>
+      </div>
     </div>
-    <div>
-      <label for="birthTime">Enter your time of birth:</label><br>
-      <input type="time" id="birthTime" name="birthTime" required>
-    </div>
-    <div>
-      <label>Select your location of birth:</label><br>
-      <div id="map"></div>
-      <!-- Hidden field to store the latitude and longitude -->
-      <input type="hidden" id="birthLocation" name="birthLocation">
-      <p>Click on the map to choose your birth location.</p>
-    </div>
-    <button type="submit">Generate Starsign</button>
-  </form>
-  
-  <!-- Progress Bar (initially hidden) -->
-  <div id="progressContainer" style="display:none; margin-top:20px;">
-    <p>Processing your answers with science...</p>
-    <div id="progressBarContainer">
-      <div id="progressBar"></div>
+
+    <!-- Sign Container -->
+    <div id="signContainer">
+      <h2>Your Arnakotelonkaigue sign is</h2>
+      <div id="glyphGrid"></div>
+      <p id="signNumber"></p>
+      <button id="tryAgain">Try again</button>
     </div>
   </div>
-  
-  <!-- Container for the generated starsign -->
-  <h2>Your Starsign</h2>
-  <div id="starsign"></div>
-  
-  <!-- Leaflet JS for the map selector -->
+
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // Build the glyphs array using the correct relative path.
-    // Since Arnakotelonkaigue.html is in assets/, the images are located at:
-    // assets/tiles/images/A (1).png  → relative path: "tiles/images/A (1).png"
+    // Build the glyphs array.
+    // Images are in "tiles/images/A (1).png" through "tiles/images/A (105).png"
     const glyphs = [];
     for (let i = 1; i <= 105; i++) {
       glyphs.push(`tiles/images/A (${i}).png`);
     }
-    
-    // Simple hash function that converts a string into a 32-bit integer.
+
+    // A simple hash function to generate a seed from a string.
     function hashString(str) {
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
@@ -98,8 +154,8 @@
       }
       return hash;
     }
-    
-    // A seeded pseudo-random number generator (Mulberry32)
+
+    // Seeded pseudo-random number generator (Mulberry32)
     function mulberry32(seed) {
       return function() {
         var t = seed += 0x6D2B79F5;
@@ -108,85 +164,99 @@
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
       }
     }
-    
-    // Initialize the map for location selection using Leaflet.
-    var map = L.map('map').setView([20, 0], 2); // Centered at latitude 20, longitude 0 with zoom level 2
+
+    // Initialize the Leaflet map.
+    var map = L.map('map').setView([20, 0], 2);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
       attribution: '© OpenStreetMap'
     }).addTo(map);
-    
+
     var marker;
     map.on('click', function(e) {
-      var lat = e.latlng.lat.toFixed(5);
-      var lng = e.latlng.lng.toFixed(5);
-      // Remove the previous marker if it exists.
+      const lat = e.latlng.lat.toFixed(5);
+      const lng = e.latlng.lng.toFixed(5);
+      // Remove previous marker if present.
       if (marker) {
         map.removeLayer(marker);
       }
       marker = L.marker([lat, lng]).addTo(map);
-      // Save the selected location in a hidden input as "lat,lng"
+      // Store the selected coordinates.
       document.getElementById('birthLocation').value = lat + ',' + lng;
     });
-    
-    // Listen for form submission.
+
+    // When the form is submitted…
     document.getElementById('starsignForm').addEventListener('submit', function(event) {
-      event.preventDefault();  // Prevent the page from reloading
-      
-      // Ensure that a birth location has been selected.
+      event.preventDefault();
       const birthLocation = document.getElementById('birthLocation').value;
       if (!birthLocation) {
         alert("Please select your birth location by clicking on the map.");
         return;
       }
-      
-      // Retrieve the input values.
       const birthDate = document.getElementById('birthDate').value;
       const birthTime = document.getElementById('birthTime').value;
-      
-      // Combine the answers to create a seed string.
       const seedString = birthDate + birthTime + birthLocation;
-      
-      // Generate a numeric seed from the combined answers.
       const seed = hashString(seedString);
-      
-      // Hide the form and display the progress bar.
+
+      // Hide the form and show the progress bar.
       document.getElementById('starsignForm').style.display = 'none';
       document.getElementById('progressContainer').style.display = 'block';
-      
-      // Animate the progress bar.
+
       let progress = 0;
       const progressBar = document.getElementById('progressBar');
       const interval = setInterval(function() {
-        progress += 1;
+        progress++;
         progressBar.style.width = progress + '%';
         if (progress >= 100) {
           clearInterval(interval);
-          // Once the progress reaches 100%, generate the starsign.
-          generateStarsign(seed);
-          // Hide the progress container after generation.
           document.getElementById('progressContainer').style.display = 'none';
+          generateSign(seed);
         }
-      }, 30); // Adjust the speed (30ms per 1% increment) as needed.
+      }, 30); // Adjust this interval for speed if needed.
     });
-    
-    // Generate and display the starsign based on the seeded random generator.
-    function generateStarsign(seed) {
+
+    // Generate the Arnakotelonkaigue sign.
+    function generateSign(seed) {
       const random = mulberry32(seed);
-      const numGlyphs = 5; // For example, display 5 glyphs.
-      
-      const starsignDiv = document.getElementById('starsign');
-      starsignDiv.innerHTML = '';
-      
+      const glyphGrid = document.getElementById('glyphGrid');
+      glyphGrid.innerHTML = '';
+      let arkaNumber = 0; // Sum of the glyph numbers.
+      const numGlyphs = 6;  // 6 glyphs (2 columns x 3 rows)
+
       for (let i = 0; i < numGlyphs; i++) {
         const index = Math.floor(random() * glyphs.length);
+        // Since filenames are "A (number).png" and our array index is 0-based:
+        arkaNumber += (index + 1);
+
+        // Create a wrapper for each glyph with a black border.
+        const glyphWrapper = document.createElement('div');
+        glyphWrapper.className = 'glyphWrapper';
+
         const img = document.createElement('img');
         img.src = glyphs[index];
         img.alt = 'Glyph ' + (index + 1);
-        img.className = 'glyph';
-        starsignDiv.appendChild(img);
+
+        glyphWrapper.appendChild(img);
+        glyphGrid.appendChild(glyphWrapper);
       }
+      // Display the Arnakotelonkaigue number.
+      document.getElementById('signNumber').innerText = "Your Arnakotelonkaigue number is " + arkaNumber;
+      document.getElementById('signContainer').style.display = 'block';
     }
+
+    // "Try again" button to reset the app.
+    document.getElementById('tryAgain').addEventListener('click', function() {
+      // Reset the form fields.
+      document.getElementById('starsignForm').reset();
+      document.getElementById('birthLocation').value = '';
+      // Remove the marker from the map, if present.
+      if (marker) {
+        map.removeLayer(marker);
+      }
+      // Hide the sign container and re-display the form.
+      document.getElementById('signContainer').style.display = 'none';
+      document.getElementById('starsignForm').style.display = 'block';
+    });
   </script>
 </body>
 </html>
