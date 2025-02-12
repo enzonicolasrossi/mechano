@@ -13,16 +13,45 @@
       padding: 0;
       color: #ffffff;
       background-color: #000033; /* Night blue */
-      /* Pixel star effect using radial gradients */
+      position: relative;
+    }
+    /* Starry, Twinkling Background using a pseudo-element */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* Multiple radial gradients with different sizes and positions for randomness */
       background-image: 
         radial-gradient(white 1px, transparent 1px),
         radial-gradient(white 1px, transparent 1px),
         radial-gradient(white 1px, transparent 1px),
         radial-gradient(white 1px, transparent 1px),
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(white 1px, transparent 1px),
         radial-gradient(white 1px, transparent 1px);
-      background-size: 100px 100px;
-      background-position: 10px 20px, 50px 60px, 80px 10px, 20px 70px, 70px 30px;
+      background-size: 80px 80px, 120px 120px, 90px 90px, 150px 150px, 60px 60px, 200px 200px, 100px 100px;
+      background-position: 10px 20px, 50px 60px, 80px 10px, 20px 70px, 70px 30px, 40px 90px, 90px 40px;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: -1;
+      animation: twinkle 10s infinite ease-in-out;
     }
+
+    @keyframes twinkle {
+      0% {
+        background-position: 10px 20px, 50px 60px, 80px 10px, 20px 70px, 70px 30px, 40px 90px, 90px 40px;
+      }
+      50% {
+        background-position: 15px 25px, 55px 65px, 85px 15px, 25px 75px, 75px 35px, 45px 95px, 95px 45px;
+      }
+      100% {
+        background-position: 10px 20px, 50px 60px, 80px 10px, 20px 70px, 70px 30px, 40px 90px, 90px 40px;
+      }
+    }
+
     .container {
       max-width: 800px;
       margin: 0 auto;
@@ -45,8 +74,17 @@
     form div {
       margin-bottom: 15px;
     }
-    form label, form input, form p {
+    form label, form p {
       color: #ffffff;
+    }
+    /* Style input fields to be legible on dark backgrounds */
+    input[type="date"],
+    input[type="time"] {
+      background-color: #333;
+      border: 1px solid #555;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 4px;
     }
     input, button {
       font-family: inherit;
@@ -125,7 +163,9 @@
 <body>
   <div class="container">
     <h1>Arnakotelonkaigue</h1>
-    <p>Los arnakotelo utilizaban una combinacion de ciencia y conocimiento arcano para determinar los simbolos de poder de una persona. Basado en el lugar donde naciste y la posicion de los planetas podian canalizar tu energia para poder asignarte tu numero astral. Hemos destilado todo el conocimiento cientifico de su epoca con algoritmos para poder ayudarte a conseguir el tuyo. Utiliza estos simbolos con cuidado, ya que su poder es ilimitado una vez logres desentrañar su significado.</p>
+    <p>
+      The Arnakotelo used a combination of science and arcane knowledge to determine a person’s symbols of power. Based on your place of birth and the positions of the planets, they could channel your energy to assign you your astral number. We have distilled all the scientific knowledge of their era into algorithms to help you discover yours. Use these symbols carefully, for their power is unlimited once you manage to unravel their meaning.
+    </p>
 
     <!-- Form for Birth Details -->
     <form id="starsignForm">
