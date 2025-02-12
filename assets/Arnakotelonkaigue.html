@@ -81,11 +81,12 @@
   <!-- Leaflet JS for the map selector -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // Build the glyphs array automatically using the provided file format.
-    // The glyph images are stored in "assets/tiles/images" and named "A (1).png" through "A (105).png".
+    // Build the glyphs array using the correct relative path.
+    // Since Arnakotelonkaigue.html is in assets/, the images are located at:
+    // assets/tiles/images/A (1).png  → relative path: "tiles/images/A (1).png"
     const glyphs = [];
     for (let i = 1; i <= 105; i++) {
-      glyphs.push(`assets/tiles/images/A (${i}).png`);
+      glyphs.push(`tiles/images/A (${i}).png`);
     }
     
     // Simple hash function that converts a string into a 32-bit integer.
