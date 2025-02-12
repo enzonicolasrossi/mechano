@@ -58,19 +58,20 @@
       display: none;
       margin-top: 20px;
     }
+    /* The sign frame wraps the glyph grid and creates the black rectangle background */
+    #signFrame {
+      display: inline-block;
+      border: 5px solid black;
+      padding: 10px;
+      background-color: black;
+    }
     #glyphGrid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      max-width: 300px;
-      margin: 0 auto 10px auto;
+      margin: 0 auto;
     }
-    .glyphWrapper {
-      border: 2px solid black;
-      padding: 5px;
-      background-color: white;
-    }
-    .glyphWrapper img {
+    #glyphGrid img {
       width: 100%;
       height: auto;
       display: block;
@@ -129,7 +130,10 @@
     <!-- Sign Container -->
     <div id="signContainer">
       <h2>Your Arnakotelonkaigue sign is</h2>
-      <div id="glyphGrid"></div>
+      <!-- The black frame container -->
+      <div id="signFrame">
+        <div id="glyphGrid"></div>
+      </div>
       <p id="signNumber"></p>
       <button id="tryAgain">Try again</button>
     </div>
@@ -228,16 +232,11 @@
         // Since filenames are "A (number).png" and our array index is 0-based:
         arkaNumber += (index + 1);
 
-        // Create a wrapper for each glyph with a black border.
-        const glyphWrapper = document.createElement('div');
-        glyphWrapper.className = 'glyphWrapper';
-
         const img = document.createElement('img');
         img.src = glyphs[index];
         img.alt = 'Glyph ' + (index + 1);
 
-        glyphWrapper.appendChild(img);
-        glyphGrid.appendChild(glyphWrapper);
+        glyphGrid.appendChild(img);
       }
       // Display the Arnakotelonkaigue number.
       document.getElementById('signNumber').innerText = "Your Arnakotelonkaigue number is " + arkaNumber;
