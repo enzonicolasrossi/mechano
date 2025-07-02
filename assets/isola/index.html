@@ -29,7 +29,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdn.osmbuildings.org/OSMBuildings-L.min.js"></script>
+  <script src="https://cdn.osmbuildings.org/OSMBuildings.js"></script>
   <script>
     const map = new L.Map('map').setView([59.9139, 10.7522], 17);
 
@@ -38,12 +38,14 @@
     }).addTo(map);
 
     const osmb = new OSMBuildings({
-      baseURL: 'https://cdn.osmbuildings.org/OSMBuildings/',
+      position: { latitude: 59.9139, longitude: 10.7522 },
+      zoom: 17,
       minZoom: 15,
-      maxZoom: 20,
-      attribution: '© OSM Buildings'
+      maxZoom: 20
     }).addTo(map);
 
+    osmb.setView({ latitude: 59.9139, longitude: 10.7522, zoom: 17 });
+    osmb.showBuildings(true);
     osmb.shadows(true);
 
     const timeSlider = document.getElementById('time');
@@ -51,9 +53,7 @@
 
     function updateShadows(hour) {
       const now = new Date();
-      now.setHours(hour);
-      now.setMinutes(0);
-      now.setSeconds(0);
+      now.setHours(hour, 0, 0);
       osmb.date(now);
       hourLabel.innerText = `${hour.toString().padStart(2, '0')}:00`;
     }
@@ -62,7 +62,7 @@
       updateShadows(parseInt(e.target.value));
     });
 
-    updateShadows(12); // initialize at noon
+    updateShadows(12);
   </script>
 </body>
 </html>
