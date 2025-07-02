@@ -1,60 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Oslo Building Shadows Map</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body, html { margin: 0; padding: 0; height: 100%; }
-    #map { height: 100vh; width: 100vw; }
-    #controls {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(255,255,255,0.9);
-      padding: 10px;
-      border-radius: 8px;
-      z-index: 999;
-      font-family: sans-serif;
-    }
-  </style>
+<meta charset="utf-8" />
+<title>Simple Oslo Shadows</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<style>
+  html, body, #map {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+  }
+</style>
 </head>
 <body>
   <div id="map"></div>
-  <div id="controls">
-    <label for="time">Time of Day:</label>
-    <input type="range" id="time" min="0" max="23" value="12" />
-    <span id="hour">12:00</span>
-  </div>
 
   <script src="https://cdn.osmbuildings.org/OSMBuildings.js"></script>
   <script>
-    window.onload = function() {
-      const osmb = new OSMBuildings({
-        container: 'map',
-        position: { latitude: 59.9139, longitude: 10.7522 },
-        zoom: 17,
-        minZoom: 15,
-        maxZoom: 20
-      });
+    const map = new OSMBuildings({
+      container: 'map',
+      position: { latitude: 59.9139, longitude: 10.7522 },
+      zoom: 17,
+      minZoom: 15,
+      maxZoom: 20,
+      effects: ['shadows'] // turn on shadows!
+    });
 
-      osmb.setView({ latitude: 59.9139, longitude: 10.7522, zoom: 17 });
-      osmb.showBuildings(true);
-      osmb.shadows(true);
+    // Set current date/time for sun position & shadows
+    map.date(new Date());
 
-      const timeSlider = document.getElementById('time');
-      const hourLabel = document.getElementById('hour');
-
-      function updateShadows(hour) {
-        const now = new Date();
-        now.setHours(hour);
-        osmb.date(now);
-        hourLabel.innerText = `${hour.toString().padStart(2, '0')}:00`;
-      }
-
-      timeSlider.addEventListener('input', e => updateShadows(+e.target.value));
-      updateShadows(12);
-    };
+    // If you want to adjust shadows time, you can do:
+    // map.date(new Date('2025-07-02T12:00:00')); // set specific date/time
   </script>
 </body>
 </html>
