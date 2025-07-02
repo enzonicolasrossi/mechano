@@ -29,7 +29,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdn.osmbuildings.org/OSMBuildings-GLMap.js"></script>
+  <script src="https://cdn.osmbuildings.org/OSMBuildings-L.min.js"></script>
   <script>
     const map = new L.Map('map').setView([59.9139, 10.7522], 17);
 
@@ -37,7 +37,13 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    const osmb = new OSMBuildings(map).load();
+    const osmb = new OSMBuildings({
+      baseURL: 'https://cdn.osmbuildings.org/OSMBuildings/',
+      minZoom: 15,
+      maxZoom: 20,
+      attribution: '© OSM Buildings'
+    }).addTo(map);
+
     osmb.shadows(true);
 
     const timeSlider = document.getElementById('time');
