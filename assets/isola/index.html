@@ -2,8 +2,8 @@
 <html>
 <head>
   <title>Oslo Building Shadows Map</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body, html { margin: 0; padding: 0; height: 100%; }
     #map { height: 100vh; width: 100vw; }
@@ -29,30 +29,32 @@
 
   <script src="https://cdn.osmbuildings.org/OSMBuildings.js"></script>
   <script>
-    const osmb = new OSMBuildings({
-      container: 'map',
-      position: { latitude: 59.9139, longitude: 10.7522 },
-      zoom: 17,
-      minZoom: 15,
-      maxZoom: 20
-    });
+    window.onload = function() {
+      const osmb = new OSMBuildings({
+        container: 'map',
+        position: { latitude: 59.9139, longitude: 10.7522 },
+        zoom: 17,
+        minZoom: 15,
+        maxZoom: 20
+      });
 
-    osmb.setView({ latitude: 59.9139, longitude: 10.7522, zoom: 17 });
-    osmb.showBuildings(true);
-    osmb.shadows(true);
+      osmb.setView({ latitude: 59.9139, longitude: 10.7522, zoom: 17 });
+      osmb.showBuildings(true);
+      osmb.shadows(true);
 
-    const timeSlider = document.getElementById('time');
-    const hourLabel = document.getElementById('hour');
+      const timeSlider = document.getElementById('time');
+      const hourLabel = document.getElementById('hour');
 
-    function updateShadows(hour) {
-      const now = new Date();
-      now.setHours(hour);
-      osmb.date(now);
-      hourLabel.innerText = `${hour.toString().padStart(2, '0')}:00`;
-    }
+      function updateShadows(hour) {
+        const now = new Date();
+        now.setHours(hour);
+        osmb.date(now);
+        hourLabel.innerText = `${hour.toString().padStart(2, '0')}:00`;
+      }
 
-    timeSlider.addEventListener('input', e => updateShadows(+e.target.value));
-    updateShadows(12);
+      timeSlider.addEventListener('input', e => updateShadows(+e.target.value));
+      updateShadows(12);
+    };
   </script>
 </body>
 </html>
