@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Oslo Building Shadows Map</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; }
+    #map { height: 100vh; width: 100vw; }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 999;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <label for="time">Time of Day:</label>
+    <input type="range" id="time" min="0" max="23" value="12" />
+    <span id="hour">12:00</span>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.osmbuildings.org/OSMBuildings-GLMap.js"></script>
+  <script>
+    const map = new L.Map('map').setView([59.9139, 10.7522], 17);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const osmb = new OSMBuildings(map).load();
+    osmb.shadows(true);
+
+    const timeSlider = document.getElementById('time');
+    const hourLabel = document.getElementById('hour');
+
+    function updateShadows(hour) {
+      const now = new Date();
+      now.setHours(hour);
+      now.setMinutes(0);
+      now.setSeconds(0);
+      osmb.date(now);
+      hourLabel.innerText = `${hour.toString().padStart(2, '0')}:00`;
+    }
+
+    timeSlider.addEventListener('input', (e) => {
+      updateShadows(parseInt(e.target.value));
+    });
+
+    updateShadows(12); // initialize at noon
+  </script>
+</body>
+</html>
