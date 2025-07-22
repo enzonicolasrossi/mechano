@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Oslo Shadow Map (With Bars & Restaurants)</title>
+  <title>Oslo Shadow Map (With Bars, Restaurants & Purple Shadows)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link
     rel="stylesheet"
@@ -49,7 +49,7 @@
     </label>
     <div id="timeLabel">00:00</div>
 
-    <button id="go">Reload Buildings</button>
+    <button id="go">Reload Buildings & Places</button>
   </div>
 
   <div id="map"></div>
@@ -64,6 +64,7 @@
     }).addTo(map);
 
     let bLayer, shadowLayer, placesLayer, bData;
+    const MAX_SHADOW_LENGTH = 5000; // in meters, clamp for low sun
 
     // --- Load buildings via Overpass ---
     async function loadBuildings() {
@@ -164,7 +165,7 @@ out center;
       ).addTo(map);
     }
 
-    // --- Compute & draw unified shadows + rays ---
+    // --- Compute & draw unified purple shadows + rays ---
     function drawShadows(date) {
       if (!bData) return;
       if (shadowLayer) map.removeLayer(shadowLayer);
@@ -182,7 +183,8 @@ out center;
       bData.forEach(feat => {
         const ring = feat.geometry.coordinates[0];
         const h = feat.properties.hoyde;
-        const Lm = h / Math.tan(altitude);
+        let Lm = h / Math.tan(altitude);
+        if (Lm > MAX_SHADOW_LENGTH) Lm = MAX_SHADOW_LENGTH;
         const dx = -Math.sin(azimuth) * Lm * m2deg;
         const dy = -Math.cos(azimuth) * Lm * m2deg;
         // footprint
@@ -191,7 +193,7 @@ out center;
         // rays
         for (let i = 0; i < ring.length; i++) {
           const [lng1, lat1] = ring[i];
-          const [lng2, lat2] = ring[(i+1)%ring.length];
+          const [lng2, lat2] = ring[(i+1) % ring.length];
           const quad = [
             [lng1, lat1],
             [lng2, lat2],
@@ -204,7 +206,7 @@ out center;
 
       shadowLayer = L.geoJSON(
         { type:'FeatureCollection', features: allFeatures },
-        { style: { color:'#000', weight:0, fillOpacity:0.3 } }
+        { style: { color:'#800080', fillColor:'#800080', weight:0, fillOpacity:0.2 } }
       ).addTo(map);
     }
 
