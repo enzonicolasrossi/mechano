@@ -2,12 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Oslo Shadow Map (With Bars, Restaurants & Purple Shadows)</title>
+  <title>Oslo Shadow Map (Purple Shadows with Nightshade Overlay)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <style>
     body { margin:0; }
     #map { position:absolute; top:60px; bottom:0; width:100%; }
@@ -24,32 +21,18 @@
       z-index: 1000;
     }
     #controls input[type="date"] { height: 28px; }
-    #controls input[type="range"] {
-      flex: 1;
-      margin: 0 8px;
-    }
-    #timeLabel {
-      min-width: 50px;
-      text-align: center;
-    }
+    #controls input[type="range"] { flex: 1; margin: 0 8px; }
+    #timeLabel { min-width: 50px; text-align: center; }
     #controls button { height: 32px; }
   </style>
 </head>
 <body>
 
   <div id="controls">
-    <label>
-      Date:
-      <input type="date" id="dateInput" />
-    </label>
-
-    <label style="white-space: nowrap;">
-      Time:
-      <input type="range" id="timeSlider" min="0" max="1440" step="1" />
-    </label>
+    <label>Date: <input type="date" id="dateInput" /></label>
+    <label style="white-space:nowrap;">Time: <input type="range" id="timeSlider" min="0" max="1440" step="1" /></label>
     <div id="timeLabel">00:00</div>
-
-    <button id="go">Reload Buildings & Places</button>
+    <button id="go">Reload Data</button>
   </div>
 
   <div id="map"></div>
@@ -57,191 +40,133 @@
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="https://unpkg.com/suncalc/suncalc.js"></script>
   <script>
-    // --- Map init ---
+    // Map initialization
     const map = L.map('map').setView([59.9138, 10.7526], 16);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
 
-    let bLayer, shadowLayer, placesLayer, bData;
-    const MAX_SHADOW_LENGTH = 5000; // in meters, clamp for low sun
+    let bLayer, shadowLayer, placesLayer, nightLayer, buildingData;
+    const MAX_SHADOW_LENGTH = 3000;  // meters
+    const MIN_ALTITUDE = 0.1;        // radians (~5.7°)
 
-    // --- Load buildings via Overpass ---
+    // Fetch building footprints
     async function loadBuildings() {
       const b = map.getBounds();
       const bbox = [b.getSouth(), b.getWest(), b.getNorth(), b.getEast()].join(',');
       const query = `
-[out:json][timeout:25];
-(
+[out:json][timeout:25];(
   way["building"](${bbox});
   relation["building"](${bbox});
-);
-out geom;
-`;
-      const res = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST', body: query
-      });
+);out geom;`;
+      const res = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:query });
       const json = await res.json();
-      return json.elements
-        .filter(el => el.geometry)
-        .map(el => {
-          const coords = el.geometry.map(pt => [pt.lon, pt.lat]);
-          const h = el.tags && el.tags.height
-            ? parseFloat(el.tags.height) : 10;
-          return { 
-            type: 'Feature',
-            properties: { hoyde: h },
-            geometry: { type: 'Polygon', coordinates: [coords] }
-          };
-        });
+      return json.elements.filter(el=>el.geometry).map(el=>({
+        type:'Feature',
+        properties:{ hoyde: el.tags && el.tags.height ? parseFloat(el.tags.height):10 },
+        geometry:{ type:'Polygon', coordinates:[ el.geometry.map(pt=>[pt.lon,pt.lat]) ] }
+      }));
     }
 
-    // --- Load bars & restaurants via Overpass ---
+    // Fetch bars & restaurants
     async function loadPlaces() {
       const b = map.getBounds();
       const bbox = [b.getSouth(), b.getWest(), b.getNorth(), b.getEast()].join(',');
       const query = `
-[out:json][timeout:25];
-(
+[out:json][timeout:25];(
   node["amenity"~"bar|restaurant"](${bbox});
   way["amenity"~"bar|restaurant"](${bbox});
   relation["amenity"~"bar|restaurant"](${bbox});
-);
-out center;
-`;
-      const res = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST', body: query
-      });
+);out center;`;
+      const res = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:query });
       const json = await res.json();
-      const features = json.elements
-        .filter(el => el.lat || el.center)
-        .map(el => {
-          const lat = el.type === 'node' ? el.lat : el.center.lat;
-          const lon = el.type === 'node' ? el.lon : el.center.lon;
-          return {
-            type: 'Feature',
-            properties: { name: el.tags.name || el.tags.amenity },
-            geometry: { type: 'Point', coordinates: [lon, lat] }
-          };
-        });
-      return features;
+      return json.elements.filter(el=>el.lat||el.center).map(el=>({
+        type:'Feature',
+        properties:{ name: el.tags && el.tags.name ? el.tags.name : el.tags.amenity },
+        geometry:{ type:'Point', coordinates: [ el.lon||el.center.lon, el.lat||el.center.lat ] }
+      }));
     }
 
-    // --- Show buildings, shadows, and places ---
-    async function showData() {
-      bData = await loadBuildings();
-      drawShadows(getSelectedDate());
-      showBuildingsLayer();
+    // Main draw function
+    async function refreshData() {
+      buildingData = await loadBuildings();
+      drawShadows(getDateTime());
+      showBuildings();
       const places = await loadPlaces();
-      showPlacesLayer(places);
+      showPlaces(places);
     }
 
-    function showBuildingsLayer() {
-      if (bLayer) map.removeLayer(bLayer);
-      bLayer = L.geoJSON(
-        { type:'FeatureCollection', features: bData },
-        { style: { color:'#666', weight:1, fillOpacity:1 } }
-      ).addTo(map);
+    function showBuildings() {
+      if(bLayer) map.removeLayer(bLayer);
+      bLayer = L.geoJSON({type:'FeatureCollection',features:buildingData}, { style:{ color:'#666',weight:1,fillOpacity:1 } }).addTo(map);
     }
 
-    function showPlacesLayer(features) {
-      if (placesLayer) map.removeLayer(placesLayer);
-      placesLayer = L.geoJSON(
-        { type:'FeatureCollection', features },
-        {
-          pointToLayer: (feat, latlng) => L.circleMarker(latlng, {
-            radius: 6,
-            fillColor: '#e74c3c',
-            color: '#c0392b',
-            weight: 1,
-            fillOpacity: 0.8
-          }),
-          onEachFeature: (feat, layer) => {
-            if (feat.properties.name) {
-              layer.bindPopup(feat.properties.name);
-            }
-          }
-        }
-      ).addTo(map);
+    function showPlaces(features) {
+      if(placesLayer) map.removeLayer(placesLayer);
+      placesLayer = L.geoJSON({type:'FeatureCollection',features}, {
+        pointToLayer:(f,latlng)=>L.circleMarker(latlng,{ radius:6,fillColor:'#e74c3c',color:'#c0392b',weight:1,fillOpacity:0.8 }),
+        onEachFeature:(f,l)=>f.properties.name&&l.bindPopup(f.properties.name)
+      }).addTo(map);
     }
 
-    // --- Compute & draw unified purple shadows + rays ---
+    // Shadows + rays with nightshade overlay
     function drawShadows(date) {
-      if (!bData) return;
-      if (shadowLayer) map.removeLayer(shadowLayer);
+      if(shadowLayer) map.removeLayer(shadowLayer);
+      if(nightLayer) map.removeLayer(nightLayer);
+      if(!buildingData) return;
 
-      const sun = SunCalc.getPosition(date, 59.9138, 10.7526);
-      const { altitude, azimuth } = sun;
-      if (altitude <= 0) {
-        shadowLayer = L.layerGroup().addTo(map);
+      const sun = SunCalc.getPosition(date,59.9138,10.7526);
+      // Night: add full-screen opaque layer
+      if(sun.altitude < 0) {
+        nightLayer = L.rectangle(map.getBounds(), { color: '#000', weight: 0, fillColor: '#000', fillOpacity: 0.5 }).addTo(map);
         return;
+      }
+      // Dusk/dawn overlay
+      if(sun.altitude < MIN_ALTITUDE) {
+        nightLayer = L.rectangle(map.getBounds(), { color: '#000', weight: 0, fillColor: '#000', fillOpacity: 0.2 }).addTo(map);
       }
 
       const m2deg = 1/111000;
-      const allFeatures = [];
-
-      bData.forEach(feat => {
-        const ring = feat.geometry.coordinates[0];
-        const h = feat.properties.hoyde;
-        let Lm = h / Math.tan(altitude);
+      const features = [];
+      buildingData.forEach(f => {
+        const ring = f.geometry.coordinates[0];
+        const h = f.properties.hoyde;
+        let Lm = h / Math.tan(sun.altitude);
         if (Lm > MAX_SHADOW_LENGTH) Lm = MAX_SHADOW_LENGTH;
-        const dx = -Math.sin(azimuth) * Lm * m2deg;
-        const dy = -Math.cos(azimuth) * Lm * m2deg;
+        const dx = -Math.sin(sun.azimuth) * Lm * m2deg;
+        const dy = -Math.cos(sun.azimuth) * Lm * m2deg;
+
         // footprint
-        const footprint = ring.map(([lng, lat]) => [lng + dx, lat + dy]);
-        allFeatures.push({ type:'Feature', geometry:{ type:'Polygon', coordinates:[footprint] } });
-        // rays
-        for (let i = 0; i < ring.length; i++) {
-          const [lng1, lat1] = ring[i];
+        features.push({ type:'Feature', geometry:{ type:'Polygon', coordinates:[ ring.map(([lng,lat])=>[lng+dx,lat+dy]) ] } });
+
+        // rays always, even when low sun, clamped length
+        ring.forEach((pt, i) => {
+          const [lng1, lat1] = pt;
           const [lng2, lat2] = ring[(i+1) % ring.length];
-          const quad = [
+          features.push({ type:'Feature', geometry: { type:'Polygon', coordinates:[[
             [lng1, lat1],
             [lng2, lat2],
             [lng2 + dx, lat2 + dy],
             [lng1 + dx, lat1 + dy]
-          ];
-          allFeatures.push({ type:'Feature', geometry:{ type:'Polygon', coordinates:[quad] } });
-        }
+          ]] } });
+        });
       });
-
-      shadowLayer = L.geoJSON(
-        { type:'FeatureCollection', features: allFeatures },
-        { style: { color:'#800080', fillColor:'#800080', weight:0, fillOpacity:0.2 } }
-      ).addTo(map);
+      shadowLayer = L.geoJSON({ type:'FeatureCollection', features }, { style:{ color:'#800080', fillColor:'#800080', weight:0, fillOpacity:0.2 } }).addTo(map);
     }
 
-    // --- Helpers ---
-    function getSelectedDate() {
-      const d = document.getElementById('dateInput').value;
-      const mins = +document.getElementById('timeSlider').value;
-      const dt = new Date(d);
-      dt.setHours(0, mins, 0, 0);
-      return dt;
-    }
-    function updateTimeLabel() {
-      const mins = +document.getElementById('timeSlider').value;
-      const h = String(Math.floor(mins / 60)).padStart(2, '0');
-      const m = String(mins % 60).padStart(2, '0');
-      document.getElementById('timeLabel').textContent = `${h}:${m}`;
-    }
+    function getDateTime() { const d = document.getElementById('dateInput').value; const mins = +document.getElementById('timeSlider').value; const dt = new Date(d); dt.setHours(0, mins, 0, 0); return dt; }
+    function updateLabel() { const mins = +document.getElementById('timeSlider').value; const h = String(Math.floor(mins/60)).padStart(2,'0'); const m = String(mins%60).padStart(2,'0'); document.getElementById('timeLabel').textContent = `${h}:${m}`; }
 
-    // --- Events ---
-    document.getElementById('go').addEventListener('click', showData);
-    document.getElementById('timeSlider').addEventListener('input', () => {
-      updateTimeLabel();
-      drawShadows(getSelectedDate());
-    });
-    document.getElementById('dateInput').addEventListener('change', () => {
-      drawShadows(getSelectedDate());
-    });
-    map.on('moveend', showData);
+    // Events
+    document.getElementById('go').addEventListener('click', refreshData);
+    document.getElementById('timeSlider').addEventListener('input', ()=>{ updateLabel(); drawShadows(getDateTime()); });
+    document.getElementById('dateInput').addEventListener('change', ()=>drawShadows(getDateTime()));
+    map.on('moveend', refreshData);
 
-    // --- Init ---
+    // Initialize
     const now = new Date();
     document.getElementById('dateInput').value = now.toISOString().slice(0,10);
     document.getElementById('timeSlider').value = now.getHours()*60 + now.getMinutes();
-    updateTimeLabel();
-    showData();
+    updateLabel();
+    refreshData();
   </script>
 </body>
 </html>
