@@ -234,7 +234,6 @@ button.generate {
   <div class="header">
     <h1>Open Muse</h1>
 
-    <!-- ★ Updated Subtitle with Instagram Link -->
     <div class="subtitle" id="subtitleText">
       v9.2.1 — by
       <a href="https://instagram.com/rossipintos" target="_blank" rel="noopener noreferrer">
@@ -243,9 +242,486 @@ button.generate {
     </div>
   </div>
 
-  <!-- Settings -->
   <div class="settings-toggle">
     <button id="settingsBtn">⚙️</button>
   </div>
 
-  <!-- (the rest of the file stays EXACTLY the same) -->
+  <div id="settingsPanel">
+    <div class="settings-row">
+      <strong id="darkModeLabel">Dark Mode</strong><br>
+      <label><input type="checkbox" id="darkToggle"> <span id="darkModeEnableLabel">Enable</span></label>
+    </div>
+    <div class="settings-row">
+      <strong id="autoAdvanceLabel">Auto-advance</strong><br>
+      <label><input type="radio" name="timer" value="0" checked> <span id="timerOffLabel">Off</span></label>
+      <label><input type="radio" name="timer" value="15"> 15s</label>
+      <label><input type="radio" name="timer" value="30"> 30s</label>
+      <label><input type="radio" name="timer" value="60"> 60s</label>
+      <label><input type="radio" name="timer" value="120"> 120s</label>
+    </div>
+    <div class="settings-row">
+      <strong id="fullscreenLabel">Fullscreen</strong><br>
+      <button id="fullscreenToggle">Enter Fullscreen</button>
+    </div>
+    <div class="settings-row">
+      <strong id="languageLabel">Language (UI)</strong><br>
+      <label><input type="radio" name="lang" value="en"> English</label>
+      <label><input type="radio" name="lang" value="es"> Español</label>
+      <label><input type="radio" name="lang" value="no"> Norsk</label>
+    </div>
+  </div>
+
+  <div id="categoryHeader">
+    <span id="categoryLabel">Category: Mechanical</span> ▼
+  </div>
+
+  <div id="categoryPanel">
+    <div class="pills" id="pillContainer"></div>
+  </div>
+
+  <button class="generate" id="generate">Generate</button>
+
+  <div id="image">
+    <div id="welcome">
+      <h2 id="welcomeTitle">Welcome to Open Muse</h2>
+      <p id="welcomeLine1">Random reference images from the public domain.</p>
+      <p id="welcomeLine2">Select a category or press Generate.</p>
+      <p id="welcomeLine3">Press Space anytime.</p>
+    </div>
+  </div>
+
+  <div id="filename"></div>
+</div>
+
+<div id="fullscreenOverlay"></div>
+
+
+
+<script>
+/* ---------------- UI LANGUAGE STRINGS ---------------- */
+
+const UI_STRINGS = {
+  en: {
+    subtitle: "v9.2.1 — by @rossipintos",
+    darkMode: "Dark Mode",
+    darkModeEnable: "Enable",
+    autoAdvance: "Auto-advance",
+    fullscreen: "Fullscreen",
+    language: "Language (UI)",
+    timerOff: "Off",
+    fullscreenBtn: "Enter Fullscreen",
+    generate: "Generate",
+    welcomeTitle: "Welcome to Open Muse",
+    welcomeLine1: "Random reference images from the public domain.",
+    welcomeLine2: "Select a category or press Generate.",
+    welcomeLine3: "Press Space anytime.",
+    categoryPrefix: "Category: ",
+    nothingFound: "Nothing found."
+  },
+  es: {
+    subtitle: "v9.2.1 — por @rossipintos",
+    darkMode: "Modo oscuro",
+    darkModeEnable: "Activar",
+    autoAdvance: "Cambio automático",
+    fullscreen: "Pantalla completa",
+    language: "Idioma (interfaz)",
+    timerOff: "Apagado",
+    fullscreenBtn: "Entrar en pantalla completa",
+    generate: "Generar",
+    welcomeTitle: "Bienvenido a Open Muse",
+    welcomeLine1: "Imágenes de referencia aleatorias de dominio público.",
+    welcomeLine2: "Elegí una categoría o apretá Generar.",
+    welcomeLine3: "Podés usar la barra espaciadora en cualquier momento.",
+    categoryPrefix: "Categoría: ",
+    nothingFound: "No se encontró nada."
+  },
+  no: {
+    subtitle: "v9.2.1 — av @rossipintos",
+    darkMode: "Mørk modus",
+    darkModeEnable: "Aktiver",
+    autoAdvance: "Auto-bytte",
+    fullscreen: "Fullskjerm",
+    language: "Språk (UI)",
+    timerOff: "Av",
+    fullscreenBtn: "Gå til fullskjerm",
+    generate: "Generer",
+    welcomeTitle: "Velkommen til Open Muse",
+    welcomeLine1: "Tilfeldige referansebilder fra det offentlige domene.",
+    welcomeLine2: "Velg en kategori eller trykk Generer.",
+    welcomeLine3: "Du kan bruke mellomromstasten når som helst.",
+    categoryPrefix: "Kategori: ",
+    nothingFound: "Ingenting funnet."
+  }
+};
+
+let currentLang = localStorage.getItem("uiLang") || "en";
+
+function applyLanguage() {
+  const t = UI_STRINGS[currentLang];
+
+  document.getElementById("subtitleText").innerHTML =
+    `v9.2.1 — by <a href="https://instagram.com/rossipintos" target="_blank">@rossipintos</a>`;
+
+  document.getElementById("darkModeLabel").textContent = t.darkMode;
+  document.getElementById("darkModeEnableLabel").textContent = t.darkModeEnable;
+  document.getElementById("autoAdvanceLabel").textContent = t.autoAdvance;
+  document.getElementById("fullscreenLabel").textContent = t.fullscreen;
+  document.getElementById("languageLabel").textContent = t.language;
+  document.getElementById("fullscreenToggle").textContent = t.fullscreenBtn;
+  document.getElementById("generate").textContent = t.generate;
+  document.getElementById("timerOffLabel").textContent = t.timerOff;
+
+  const welcomeTitle = document.getElementById("welcomeTitle");
+  if (welcomeTitle) {
+    welcomeTitle.textContent = t.welcomeTitle;
+    document.getElementById("welcomeLine1").textContent = t.welcomeLine1;
+    document.getElementById("welcomeLine2").textContent = t.welcomeLine2;
+    document.getElementById("welcomeLine3").textContent = t.welcomeLine3;
+  }
+
+  const labelEl = document.getElementById("categoryLabel");
+  const parts = labelEl.textContent.split(": ");
+  const suffix = parts.length > 1 ? parts.slice(1).join(": ") : labelEl.textContent;
+  labelEl.textContent = t.categoryPrefix + suffix;
+}
+
+/* ---------------- CATEGORIES ---------------- */
+
+const CATEGORIES = {
+  all:          "⭐ All Categories",
+  mechanical:   "⚙ Mechanical",
+  blueprints:   "📘 Blueprints & Schematics",
+  tools:        "🛠 Tools & Implements",
+  robots:       "🤖 Robots & Mechanical Arms",
+  aquatic:      "🌊 Aquatic & Marine",
+
+  bio:          "🧬 Biological",
+  anatomy:      "🫀 Anatomy",
+  entomology:   "🪲 Insects",
+  botanical:    "🌿 Botanical Illustration",
+
+  fossils:      "🦴 Fossils & Paleontology",
+  ancient:      "🪨 Ancient Artifacts",
+  masks:        "🎭 Ritual Masks & Art",
+
+  esoteric:     "🔮 Esoteric Symbols",
+  writing:      "🔤 Writing Systems",
+  patterns:     "🧵 Patterns & Ornament",
+
+  architecture: "📐 Architecture",
+  space:        "🚀 Space",
+  science_diagrams: "🧪 Science Diagrams"
+};
+
+const CATEGORY_MAP = {
+  mechanical: [
+    "Category:Machine_elements",
+    "Category:Bearings",
+    "Category:Gears",
+    "Category:Engines",
+    "Category:Mechanical_drawings"
+  ],
+  blueprints: [
+    "Category:Blueprints",
+    "Category:Technical_drawings",
+    "Category:Patent_drawings"
+  ],
+  tools: [
+    "Category:Hand_tools",
+    "Category:Construction_tools",
+    "Category:Surgical_tools"
+  ],
+  robots: [
+    "Category:Industrial_robots",
+    "Category:Humanoid_robots",
+    "Category:Robot_arms"
+  ],
+  aquatic: [
+    "Category:Marine_life",
+    "Category:Fish_illustrations",
+    "Category:Marine_mammals",
+    "Category:Coral_reefs",
+    "Category:Underwater_photographs"
+  ],
+  bio: [
+    "Category:Biological_illustrations",
+    "Category:Biological_diagrams"
+  ],
+  anatomy: [
+    "Category:Anatomy_illustrations",
+    "Category:Muscle_anatomy",
+    "Category:Skeletal_anatomy"
+  ],
+  entomology: [
+    "Category:Entomology_drawings",
+    "Category:Insect_illustrations",
+    "Category:Beetle_illustrations"
+  ],
+  botanical: [
+    "Category:Botanical_illustrations",
+    "Category:Herbarium_specimens"
+  ],
+  fossils: [
+    "Category:Fossil_images",
+    "Category:Trilobites",
+    "Category:Dinosaur_fossils"
+  ],
+  ancient: [
+    "Category:Cave_paintings",
+    "Category:Rock_art",
+    "Category:Petroglyphs",
+    "Category:Ancient_tools"
+  ],
+  masks: [
+    "Category:African_masks",
+    "Category:Ritual_masks",
+    "Category:Indigenous_masks"
+  ],
+  esoteric: [
+    "Category:Alchemy_symbols",
+    "Category:Magical_symbols",
+    "Category:Astrological_symbols"
+  ],
+  writing: [
+    "Category:Runes",
+    "Category:Ogham",
+    "Category:Neographies",
+    "Category:Cuneiform",
+    "Category:Chinese_calligraphy",
+    "Category:Japanese_calligraphy"
+  ],
+  patterns: [
+    "Category:Islamic_geometric_patterns",
+    "Category:Textile_patterns",
+    "Category:Ceramic_patterns"
+  ],
+  architecture: [
+    "Category:Architectural_drawings",
+    "Category:Stained_glass",
+    "Category:Gothic_architecture_drawings"
+  ],
+  space: [
+    "Category:Astronomical_diagrams",
+    "Category:Spacecraft_diagrams",
+    "Category:Nasa_drawings"
+  ],
+  science_diagrams: [
+    "Category:Mathematical_diagrams",
+    "Category:Physics_diagrams",
+    "Category:Chemical_diagrams"
+  ]
+};
+
+CATEGORY_MAP.all = Object.values(CATEGORY_MAP).flat();
+
+/* ---------------- BUILD PILLS ---------------- */
+
+const pillContainer = document.getElementById("pillContainer");
+Object.entries(CATEGORIES).forEach(([key, label]) => {
+  const pill = document.createElement("div");
+  pill.className = "pill";
+  pill.dataset.category = key;
+  pill.textContent = label;
+  pill.onclick = () => {
+    currentCategory = key;
+    highlightPill(key);
+    const prefix = UI_STRINGS[currentLang].categoryPrefix;
+    document.getElementById("categoryLabel").textContent = prefix + label;
+    toggleCategoryPanel(false);
+  };
+  pillContainer.appendChild(pill);
+});
+
+function highlightPill(cat) {
+  document.querySelectorAll(".pill").forEach(p =>
+    p.classList.toggle("active", p.dataset.category === cat)
+  );
+}
+
+let currentCategory = "mechanical";
+highlightPill(currentCategory);
+
+/* ---------------- CATEGORY PANEL TOGGLE ---------------- */
+
+const categoryHeader = document.getElementById("categoryHeader");
+const categoryPanel  = document.getElementById("categoryPanel");
+
+categoryHeader.onclick = () => toggleCategoryPanel();
+
+function toggleCategoryPanel(forceState) {
+  const show = (forceState !== undefined)
+    ? forceState
+    : categoryPanel.style.display !== "block";
+
+  if (show) {
+    categoryPanel.style.display = "block";
+    setTimeout(() => categoryPanel.style.opacity = 1, 10);
+  } else {
+    categoryPanel.style.opacity = 0;
+    setTimeout(() => categoryPanel.style.display = "none", 200);
+  }
+}
+
+/* ---------------- SETTINGS PANEL ---------------- */
+
+const settingsBtn   = document.getElementById("settingsBtn");
+const settingsPanel = document.getElementById("settingsPanel");
+
+settingsBtn.onclick = () => {
+  if (settingsPanel.style.display === "block") {
+    settingsPanel.style.opacity = 0;
+    setTimeout(() => settingsPanel.style.display = "none", 200);
+  } else {
+    settingsPanel.style.display = "block";
+    setTimeout(() => settingsPanel.style.opacity = 1, 10);
+  }
+};
+
+/* ---------------- DARK MODE ---------------- */
+
+const darkToggle = document.getElementById("darkToggle");
+
+if (localStorage.getItem("darkMode") === "true") {
+  document.body.classList.add("dark");
+  darkToggle.checked = true;
+}
+
+darkToggle.onchange = () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+};
+
+/* ---------------- LANGUAGE RADIO INIT ---------------- */
+
+document.querySelectorAll('input[name="lang"]').forEach(r => {
+  r.checked = (r.value === currentLang);
+  r.onchange = () => {
+    currentLang = r.value;
+    localStorage.setItem("uiLang", currentLang);
+    applyLanguage();
+  };
+});
+
+applyLanguage();
+
+/* ---------------- FETCH FROM WIKIMEDIA ---------------- */
+
+async function fetchCategory(cat) {
+  const url =
+    `https://commons.wikimedia.org/w/api.php?action=query&generator=categorymembers&gcmtitle=${encodeURIComponent(cat)}&gcmtype=file&gcmlimit=500&prop=imageinfo&iiprop=url&format=json&origin=*`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!data.query) return [];
+
+  const allowed = /\.(jpg|jpeg|png|gif|svg)$/i;
+
+  return Object.values(data.query.pages)
+    .filter(p => p.imageinfo && allowed.test(p.imageinfo[0].url))
+    .map(p => ({
+      title: p.title.replace("File:", ""),
+      url: p.imageinfo[0].url
+    }));
+}
+
+let cache = {};
+
+async function loadImages(cat) {
+  if (!cache[cat]) {
+    cache[cat] = [];
+    for (const c of CATEGORY_MAP[cat]) {
+      cache[cat].push(...await fetchCategory(c));
+    }
+  }
+  return cache[cat];
+}
+
+/* ---------------- TIMER ---------------- */
+
+let timer = null;
+
+function resetTimer() {
+  if (timer) clearInterval(timer);
+  const val = parseInt(document.querySelector('input[name="timer"]:checked').value);
+  if (val > 0) {
+    timer = setInterval(generate, val * 1000);
+  }
+}
+
+document.querySelectorAll('input[name="timer"]').forEach(r => {
+  r.onchange = resetTimer;
+});
+
+/* ---------------- FULLSCREEN ---------------- */
+
+const fullscreenToggle = document.getElementById("fullscreenToggle");
+const fullscreenOverlay = document.getElementById("fullscreenOverlay");
+const app = document.getElementById("app");
+
+fullscreenToggle.onclick = () => {
+  fullscreenOverlay.style.display = "flex";
+  app.style.opacity = 0;
+  settingsPanel.style.opacity = 0;
+  setTimeout(() => settingsPanel.style.display = "none", 200);
+};
+
+fullscreenOverlay.onclick = () => {
+  fullscreenOverlay.style.display = "none";
+  app.style.opacity = 1;
+};
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && fullscreenOverlay.style.display === "flex") {
+    fullscreenOverlay.style.display = "none";
+    app.style.opacity = 1;
+  }
+});
+
+/* ---------------- GENERATE ---------------- */
+
+const imgDiv   = document.getElementById("image");
+const filename = document.getElementById("filename");
+
+async function generate() {
+  if (fullscreenOverlay.style.display === "flex") {
+    fullscreenOverlay.innerHTML = `<div class="skeleton"></div>`;
+  } else {
+    imgDiv.innerHTML = `<div class="skeleton"></div>`;
+  }
+  filename.textContent = "";
+
+  const files = await loadImages(currentCategory);
+  if (!files.length) {
+    filename.textContent = UI_STRINGS[currentLang].nothingFound;
+    return;
+  }
+
+  const welcome = document.getElementById("welcome");
+  if (welcome) welcome.remove();
+
+  const f = files[Math.floor(Math.random() * files.length)];
+
+  if (fullscreenOverlay.style.display === "flex") {
+    fullscreenOverlay.innerHTML = `<img src="${f.url}">`;
+  } else {
+    imgDiv.innerHTML = `<img src="${f.url}">`;
+  }
+
+  filename.innerHTML =
+    `<a href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(f.title)}" target="_blank">${f.title}</a>`;
+
+  resetTimer();
+}
+
+document.getElementById("generate").onclick = generate;
+
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    generate();
+  }
+});
+</script>
+
+</body>
+</html>
