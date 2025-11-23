@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Open Muse v9.2.1</title>
+<title>Open Muse v9.2.2</title>
 
 <style>
 :root {
@@ -208,10 +208,15 @@ button.generate {
   opacity: .75;
 }
 
-/* Skeleton */
-.skeleton {
+/* Loading animation */
+.loading-container {
+  position: relative;
   width: 100%;
   height: 330px;
+}
+.skeleton {
+  width: 100%;
+  height: 100%;
   border-radius: var(--radius-lg);
   background: linear-gradient(90deg,#ddd,#eee,#ddd);
   animation: shine 1.3s infinite linear;
@@ -219,9 +224,34 @@ button.generate {
 .dark .skeleton {
   background: linear-gradient(90deg,#444,#555,#444);
 }
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  border: 4px solid rgba(0,0,0,0.15);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+.loading-label {
+  position: absolute;
+  top: calc(50% + 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Animations */
 @keyframes shine {
   0% { background-position: 200%; }
   100% { background-position: -200%; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>
 </head>
@@ -235,8 +265,8 @@ button.generate {
     <h1>Open Muse</h1>
 
     <div class="subtitle" id="subtitleText">
-      v9.2.1 — by
-      <a href="https://instagram.com/enzorossipintos" target="_blank" rel="noopener noreferrer">
+      v9.2.2 — by
+      <a href="https://instagram.com/rossipintos" target="_blank" rel="noopener noreferrer">
         @rossipintos
       </a>
     </div>
@@ -302,7 +332,7 @@ button.generate {
 
 const UI_STRINGS = {
   en: {
-    subtitle: "v9.2.1 — by @rossipintos",
+    subtitle: "v9.2.2 — by @rossipintos",
     darkMode: "Dark Mode",
     darkModeEnable: "Enable",
     autoAdvance: "Auto-advance",
@@ -316,10 +346,11 @@ const UI_STRINGS = {
     welcomeLine2: "Select a category or press Generate.",
     welcomeLine3: "Press Space anytime.",
     categoryPrefix: "Category: ",
-    nothingFound: "Nothing found."
+    nothingFound: "Nothing found.",
+    loadingText: "Loading..."
   },
   es: {
-    subtitle: "v9.2.1 — por @rossipintos",
+    subtitle: "v9.2.2 — por @rossipintos",
     darkMode: "Modo oscuro",
     darkModeEnable: "Activar",
     autoAdvance: "Cambio automático",
@@ -333,10 +364,11 @@ const UI_STRINGS = {
     welcomeLine2: "Elegí una categoría o apretá Generar.",
     welcomeLine3: "Podés usar la barra espaciadora en cualquier momento.",
     categoryPrefix: "Categoría: ",
-    nothingFound: "No se encontró nada."
+    nothingFound: "No se encontró nada.",
+    loadingText: "Cargando..."
   },
   no: {
-    subtitle: "v9.2.1 — av @rossipintos",
+    subtitle: "v9.2.2 — av @rossipintos",
     darkMode: "Mørk modus",
     darkModeEnable: "Aktiver",
     autoAdvance: "Auto-bytte",
@@ -350,7 +382,8 @@ const UI_STRINGS = {
     welcomeLine2: "Velg en kategori eller trykk Generer.",
     welcomeLine3: "Du kan bruke mellomromstasten når som helst.",
     categoryPrefix: "Kategori: ",
-    nothingFound: "Ingenting funnet."
+    nothingFound: "Ingenting funnet.",
+    loadingText: "Laster..."
   }
 };
 
@@ -360,7 +393,7 @@ function applyLanguage() {
   const t = UI_STRINGS[currentLang];
 
   document.getElementById("subtitleText").innerHTML =
-    `v9.2.1 — by <a href="https://instagram.com/rossipintos" target="_blank">@rossipintos</a>`;
+    `v9.2.2 — by <a href="https://instagram.com/rossipintos" target="_blank" rel="noopener noreferrer">@rossipintos</a>`;
 
   document.getElementById("darkModeLabel").textContent = t.darkMode;
   document.getElementById("darkModeEnableLabel").textContent = t.darkModeEnable;
@@ -448,23 +481,22 @@ const CATEGORY_MAP = {
     "Category:Biological_diagrams"
   ],
   anatomy: [
-    "Category:Anatomy_illustrations",
-    "Category:Muscle_anatomy",
-    "Category:Skeletal_anatomy"
+    "Category:Anatomical_illustrations",
+    "Category:Anatomical_illustrations_of_muscles"
   ],
   entomology: [
-    "Category:Entomology_drawings",
-    "Category:Insect_illustrations",
-    "Category:Beetle_illustrations"
+    "Category:Illustrations_of_insects",
+    "Category:Drawings_of_insects",
+    "Category:Insects_in_book_illustrations"
   ],
   botanical: [
     "Category:Botanical_illustrations",
     "Category:Herbarium_specimens"
   ],
   fossils: [
-    "Category:Fossil_images",
-    "Category:Trilobites",
-    "Category:Dinosaur_fossils"
+    "Category:Fossils",
+    "Category:Fossils_in_museums",
+    "Category:Fossils_by_type"
   ],
   ancient: [
     "Category:Cave_paintings",
@@ -682,11 +714,22 @@ document.addEventListener("keydown", e => {
 const imgDiv   = document.getElementById("image");
 const filename = document.getElementById("filename");
 
+function showLoading(targetEl) {
+  const t = UI_STRINGS[currentLang];
+  targetEl.innerHTML = `
+    <div class="loading-container">
+      <div class="skeleton"></div>
+      <div class="spinner"></div>
+      <div class="loading-label">${t.loadingText}</div>
+    </div>
+  `;
+}
+
 async function generate() {
   if (fullscreenOverlay.style.display === "flex") {
-    fullscreenOverlay.innerHTML = `<div class="skeleton"></div>`;
+    showLoading(fullscreenOverlay);
   } else {
-    imgDiv.innerHTML = `<div class="skeleton"></div>`;
+    showLoading(imgDiv);
   }
   filename.textContent = "";
 
@@ -725,4 +768,3 @@ document.addEventListener("keydown", e => {
 
 </body>
 </html>
-
